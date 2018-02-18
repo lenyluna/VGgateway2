@@ -53,19 +53,15 @@ function bufferFile(myPath){
 
 
 var mysql = require('mysql');
-var connection = mysql.createConnection({
-    host: '10.0.0.25',
-    user: 'root',
-    password: 'rl2013',
-    database: 'VGgateway',
-    port: 3306
-});
-connection.connect(function(error){
-    if(error) throw error;
-
-        console.log('conexion correcta.')
-});
-connection.end();
+function connect(){
+    return mysql.createConnection({
+        host: '10.0.0.18',
+        user: 'root',
+        password: 'l3nyluna13296',
+        database: 'VGgateway',
+        port: 3306
+    });
+}
 
 // comment
 router.get('/', function(req, res, next) {
@@ -80,10 +76,34 @@ router.get('/inicio', function(req, res, next) {
     res.render('manageUsers');
 });
 
+router.get('/manageUser', function(req, res, next) {
+    res.render('manageUsers');
+});
 
-//pruebabsksajhdfsdn
+router.get('/ConfiguracionTrunk', function(req, res, next) {
+    res.render('Trunk-Configuration');
+});
 
-router.post('/form', urlencodedParser, function(req, res) {
+router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
+    var data = req.body;
+    /*connect().query("delete from trunk where id_trunk= 1");
+    connect().query("delete from outgoing where id = 1");
+    connect().query("delete from incoming where id_in = 1");*/
+
+    connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
+        if (err) throw err;
+        console.log("Number of records inserted: " + result.affectedRows);
+    });
+    connect().query('INSERT INTO incoming VALUES (?,?,?,?,?)',[1,data.usernameI,data.passwordI,data.context,'peer'],function (err, result) {
+        if (err) throw err;
+        console.log("Number of records inserted: " + result.affectedRows);
+    });
+    connect().query("INSERT INTO trunk VALUES (1,1,1)");
+    connect().end();
+    res.redirect("/");
+});
+
+/*router.post('/form', urlencodedParser, function(req, res) {
     var data = req.body.trunk;
     fs.writeFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip.conf',data,function(err) {
         if (err) {
@@ -94,7 +114,7 @@ router.post('/form', urlencodedParser, function(req, res) {
             res.redirect('/');
         }
     });
-});
+});*/
 
 
 module.exports = router;

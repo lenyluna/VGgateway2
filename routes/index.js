@@ -16,6 +16,7 @@ var buffer = bufferFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/
 var myFile;
 var j = 0;
 
+
 function formatString(data){
     var cant = data.match("\n").length;
     var arr = data;
@@ -49,13 +50,36 @@ function bufferFile(myPath){
         }
     });
 }
+
+
+var mysql = require('mysql');
+var connection = mysql.createConnection({
+    host: '10.0.0.25',
+    user: 'root',
+    password: 'rl2013',
+    database: 'VGgateway',
+    port: 3306
+});
+connection.connect(function(error){
+    if(error) throw error;
+
+        console.log('conexion correcta.')
+});
+connection.end();
+
 // comment
 router.get('/', function(req, res, next) {
     var date = new Date();
-    res.render('index',
+    res.render('login');
+    /*res.render('index',
         { title: myFile,
-            date: date});
+            date: date});*/
 });
+
+router.get('/inicio', function(req, res, next) {
+    res.render('manageUsers');
+});
+
 
 //pruebabsksajhdfsdn
 

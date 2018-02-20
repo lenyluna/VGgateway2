@@ -53,15 +53,7 @@ function bufferFile(myPath){
 
 
 var mysql = require('mysql');
-function connect(){
-    return mysql.createConnection({
-        host: '10.0.0.18',
-        user: 'root',
-        password: 'l3nyluna13296',
-        database: 'VGgateway',
-        port: 3306
-    });
-}
+
 
 // comment
 router.get('/', function(req, res, next) {
@@ -73,6 +65,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/inicio', function(req, res, next) {
+
     res.render('manageUsers');
 });
 
@@ -83,7 +76,7 @@ router.get('/manageUser', function(req, res, next) {
 router.get('/ConfiguracionTrunk', function(req, res, next) {
     res.render('Trunk-Configuration');
 });
-
+console.log(writeFile());
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
     /*connect().query("delete from trunk where id_trunk= 1");
@@ -103,6 +96,46 @@ router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) 
     res.redirect("/");
 });
 
+// funciones
+function connect(){
+    return mysql.createConnection({
+        host: '10.0.0.18',
+        user: 'root',
+        password: 'l3nyluna13296',
+        database: 'VGgateway',
+        port: 3306
+    });
+}
+
+function writeFile(){
+     var infoOut ="";
+    save(infoOut);
+    connect().query("Select o.username,o.trunk_name,o.fromuser,o.secret,o.port,o.type,o.host,i.username as userIn,i.secret as secretIn,i.context as contextIn,i.type as typeIn " +
+        "from trunk t inner join outgoing o on t.id_outgoing =o.id inner join incoming  i on i.id_in = t.id_incoming", function(err,result,fields) {
+        if (err) throw err;
+       Object.keys(result).forEach(function(key) {
+            var row = result[key];
+            infoOut="[general]\n\n"+"["+row.trunk_name+"]\n"+"host="+row.host+"\nsecret="+row.secret+"\nusername="
+                +row.username+"\nfromuser="+row.fromuser+"\ntype="+row.type+"\nqualify=yes\n"+"port="+row.port+"\ncontext=inbound\n"
+                +"\n["+row.userIn+"]\n"+"secret="+row.secretIn+"\ntype="+row.typeIn+"\ncontext="+row.contextIn+"\n\n[2021]\n"+"type=friend\n"
+                +"host=dynamic\n"+"secret=rl123\n"+"context=from-trunk\n"+"callerid='Ricardo Luna'<2021>\n"
+                +"\n[2022]\n"+"type=friend\n"+"host=dynamic\n"+"secret=leny123\n"+"context=from-internal\n"+"callerid='Leny Luna' <2022>";
+            console.log(infoOut);
+           save(infoOut);
+        });
+    });
+    connect().end();
+}
+
+function save(data){
+    fs.writeFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip.conf',data,function(err) {
+        if (err) {
+            throw err;
+        } else {
+            console.log('Guardado Satisfactoriamente');
+        }
+    });
+}
 /*router.post('/form', urlencodedParser, function(req, res) {
     var data = req.body.trunk;
     fs.writeFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip.conf',data,function(err) {

@@ -58,14 +58,30 @@ var mysql = require('mysql');
 // comment
 router.get('/', function(req, res, next) {
     var date = new Date();
-    res.render('login');
+    res.render('login',{veri:false});
     /*res.render('index',
         { title: myFile,
             date: date});*/
 });
 
-router.get('/inicio', function(req, res, next) {
+router.post('/login', function(req, res, next) {
+    var  username = req.body.username;
+    var  pass     =  req.body.password;
 
+    connect().query("Select * from user where username=? and password=?",[username,pass],function(err,result){
+        if(err) throw err;
+        if(result.length==1){
+            console.log("Login satisfactorio");
+            res.render('manageUsers');
+        }else {
+            console.log("Informaciones incorrectas")
+            res.render('login',{user:username,veri:true});
+        }
+
+    });
+
+});
+router.get('/inicio', function(req, res, next) {
     res.render('manageUsers');
 });
 
@@ -76,18 +92,19 @@ router.get('/manageUser', function(req, res, next) {
 router.get('/ConfiguracionTrunk', function(req, res, next) {
     res.render('Trunk-Configuration');
 });
-console.log(writeFile());
+
+/*
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
     /*connect().query("delete from trunk where id_trunk= 1");
     connect().query("delete from outgoing where id = 1");
-    connect().query("delete from incoming where id_in = 1");*/
+    connect().query("delete from incoming where id_in = 1");
 
     connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
     });
-    connect().query('INSERT INTO incoming VALUES (?,?,?,?,?)',[1,data.usernameI,data.passwordI,data.context,'peer'],function (err, result) {
+    connect().query('INSERT INTO incoming VALUES (?,?,?,?,?)',[1,data.usernameI,data.passwordI,'from-trunk','peer'],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
     });
@@ -95,7 +112,7 @@ router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) 
     connect().end();
     res.redirect("/");
 });
-
+*/
 // funciones
 function connect(){
     return mysql.createConnection({

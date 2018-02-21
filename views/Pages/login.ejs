@@ -36,8 +36,19 @@
                 <img class="align-content" src="images/logo1.png" alt="">
                 <!--<p class="navbar-brand" style="color:#FFFFFF "><Strong>VG</Strong> Gateway</p>-->
             </div>
+            <%if(veri == true){%>
+                <div class="col-sm-12">
+                    <div class="sufee-alert alert with-close alert-danger alert-dismissible fade show" role="alert">
+                        <span class="badge badge-pill badge-danger">failure</span>  Authentication error, please try again.
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            <%}%>
             <div class="login-form">
-                <form action="/inicio" method="get">
+                <form action="/login" method="post">
+                    <%if(veri == false){%>
                     <div class="form-group">
                         <div class="input-group">
                             <div class="input-group-addon"><i class="fa fa-user"></i></div>
@@ -55,6 +66,28 @@
                             <input type="checkbox"> Remember Me
                         </label>
                     </div>
+                    <%}else{%>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="fa fa-user"></i></div>
+                            <input type="text" id="username" name="username" value=<%=user%> class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="fa fa-asterisk"></i></div>
+                            <input type="password" id="password" name="password" placeholder="Password" class="form-control">
+                        </div>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox"> Remember Me
+                        </label>
+                    </div>
+
+
+                    <%}%>
                     <button type="submit" class="btn btn-success btn-flat m-b-30 m-t-30"> <i class="fa fa-sign-in"></i> Sign in</button>
                 </form>
 

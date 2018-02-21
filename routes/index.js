@@ -8,11 +8,12 @@ var bodyParser = require('body-parser');
 var fs = require('fs');
 var path = require('path');
 
+
 var urlencodedParser = bodyParser.urlencoded({
     extended: false
 });
 
-var buffer = bufferFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip.conf');
+var buffer = bufferFile('/etc/asterisk/sip_custom.conf');
 var myFile;
 var j = 0;
 
@@ -93,12 +94,12 @@ router.get('/ConfiguracionTrunk', function(req, res, next) {
     res.render('Trunk-Configuration');
 });
 
-/*
+
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
     /*connect().query("delete from trunk where id_trunk= 1");
     connect().query("delete from outgoing where id = 1");
-    connect().query("delete from incoming where id_in = 1");
+    connect().query("delete from incoming where id_in = 1");*/
 
     connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
         if (err) throw err;
@@ -108,17 +109,20 @@ router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) 
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
     });
-    connect().query("INSERT INTO trunk VALUES (1,1,1)");
+    connect().query("INSERT INTO trunk VALUES (1,1,1)",function (error) {
+         if(error) throw error;
+        writeFile();
+    });
     connect().end();
     res.redirect("/");
 });
-*/
+
 // funciones
 function connect(){
     return mysql.createConnection({
-        host: '10.0.0.18',
+        host: 'localhost',
         user: 'root',
-        password: 'l3nyluna13296',
+        password: 'rl2013',
         database: 'VGgateway',
         port: 3306
     });
@@ -145,7 +149,7 @@ function writeFile(){
 }
 
 function save(data){
-    fs.writeFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip.conf',data,function(err) {
+    fs.writeFile('/etc/asterisk/sip_custom.conf',data,function(err) {
         if (err) {
             throw err;
         } else {

@@ -7,16 +7,41 @@ var bodyParser = require('body-parser');
 
 var fs = require('fs');
 var path = require('path');
-
+var command = require('node-cmd');
 
 var urlencodedParser = bodyParser.urlencoded({
     extended: false
 });
 
-var buffer = bufferFile('/etc/asterisk/sip_custom.conf');
+var buffer = bufferFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip_custom.conf');
 var myFile;
 var j = 0;
 
+var encrypt = require('bcrypt');
+function encriptar(info){
+    var saltRounds = 10;
+    encrypt.hash(info,saltRounds,function(err,hash){
+        if(err) throw err;
+        return hash;
+    });
+    /*enigma.genHash(tamaño,'rl',info,function(err,hash){
+    if(err) throw err;
+    connect().query('UPDATE user set password=? where id=1',[hash],function (err, result) {
+            if (err) throw err;
+            console.log("Number of records inserted: " + result.affectedRows);
+    });
+    connect().end();
+
+    });*/
+}
+
+function checkPass(pass,hash){
+    encrypt.compare(pass,hash,function(err,res){
+        if(err) throw err;
+        console.log("pppaa",res);
+        return res;
+    });
+}
 
 function formatString(data){
     var cant = data.match("\n").length;
@@ -66,18 +91,24 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/login', function(req, res, next) {
+   // status();
     var  username = req.body.username;
     var  pass     =  req.body.password;
-
-    connect().query("Select * from user where username=? and password=?",[username,pass],function(err,result){
+    connect().query("Select * from user where username=?",[username],function(err,result){
         if(err) throw err;
-        if(result.length==1){
-            console.log("Login satisfactorio");
-            res.render('manageUsers');
-        }else {
-            console.log("Informaciones incorrectas")
-            res.render('login',{user:username,veri:true});
-        }
+        Object.keys(result).forEach(function(key) {
+            var row = result[key];
+            encrypt.compare(pass,row.password,function(err,respuesta){
+                if(err) throw err;
+                if (result.length==1 && respuesta ) {
+                    console.log("Login satisfactorio");
+                    res.render('manageUsers');
+                } else {
+                    console.log("Informaciones incorrectas");
+                    res.render('login', {user: username, veri: true});
+                }
+            });
+        });
 
     });
 
@@ -91,10 +122,24 @@ router.get('/manageUser', function(req, res, next) {
 });
 
 router.get('/ConfiguracionTrunk', function(req, res, next) {
-    res.render('Trunk-Configuration');
+    veriTrunk(res);
+   //res.render('Trunk-Configuration',{});
 });
 
-
+router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
+    var data = req.body;
+    connect().query('UPDATE outgoing  set username=?, trunk_name=?, fromuser=?,secret=?,port=?,host=? where id=1',
+        [data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,data.host],function (err, result) {
+        if (err) throw err;
+        console.log("Number of records inserted: " + result.affectedRows);
+    });
+    connect().query('UPDATE incoming set username=?,secret=? where id_in=1',[data.usernameI,data.passwordI],function (err, result) {
+        if (err) throw err;
+        console.log("Number of records inserted: " + result.affectedRows);
+    });
+    connect().end();
+    res.redirect("/");
+});
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
     /*connect().query("delete from trunk where id_trunk= 1");
@@ -120,9 +165,9 @@ router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) 
 // funciones
 function connect(){
     return mysql.createConnection({
-        host: 'localhost',
+        host: '192.168.1.50',
         user: 'root',
-        password: 'rl2013',
+        password: 'l3nyluna13296',
         database: 'VGgateway',
         port: 3306
     });
@@ -149,13 +194,49 @@ function writeFile(){
 }
 
 function save(data){
-    fs.writeFile('/etc/asterisk/sip_custom.conf',data,function(err) {
+    fs.writeFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip_custom.conf',data,function(err) {
         if (err) {
             throw err;
         } else {
+            command.run('sudo asterisk -rx "core reload"');
             console.log('Guardado Satisfactoriamente');
         }
     });
+}
+function veriTrunk(res){
+    connect().query("Select * from trunk",function(err,result){
+        if(err){
+            throw err;
+        } else {
+            if(result.length==0){
+                res.render('Trunk-Configuration',{modify:false});
+            }else{
+                connect().query("Select o.username,o.trunk_name,o.fromuser,o.secret,o.port,o.type,o.host,i.username as userIn,i.secret as secretIn,i.context as contextIn,i.type as typeIn " +
+                    "from trunk t inner join outgoing o on t.id_outgoing =o.id inner join incoming  i on i.id_in = t.id_incoming", function(err,result,fields) {
+                    if (err) throw err;
+                    Object.keys(result).forEach(function(key) {
+                        var row = result[key];
+                        res.render('Trunk-configuration',{modify:true,trunknameS:row.trunk_name,hostS:row.host,usernameS:row.username,secretS:row.secret,
+                            fromuserS:row.fromuser,portS:row.port,userInS:row.userIn,secretInS:row.secretIn});
+                    });
+                });
+            }
+
+        }
+        connect().end();
+    });
+}
+
+var shell = require('shelljs');
+function status(){
+   var statuu = shell.exec('sudo asterisk -rx "sip show peer TrunkToIssabel"',{async:true});
+   statuu.stdout.on('data',function(data){
+       console.log("prueba:"+data);
+   });
+
+    /* command.get('ls',function(err,data,stderr){
+        console.log("bueno: ",data);
+    });*/
 }
 /*router.post('/form', urlencodedParser, function(req, res) {
     var data = req.body.trunk;

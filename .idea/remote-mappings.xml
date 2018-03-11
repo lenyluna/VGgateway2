@@ -24,6 +24,20 @@
             </list>
           </settings>
         </remote-mappings>
+        <remote-mappings server-id="NodeJS@ssh://root@192.168.1.102:22">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$" remote-root="/ProyectoFinal" />
+            </list>
+          </settings>
+        </remote-mappings>
+        <remote-mappings server-id="NodeJS@ssh://root@192.168.137.20:22">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$" remote-root="/ProyectoFinal" />
+            </list>
+          </settings>
+        </remote-mappings>
       </list>
     </list>
   </component>

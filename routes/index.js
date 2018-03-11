@@ -8,12 +8,15 @@ var bodyParser = require('body-parser');
 var fs = require('fs');
 var path = require('path');
 var command = require('node-cmd');
+var mensajeApply = false;
+var myip = require('ip');
+var cmdParser = require('string');
 
 var urlencodedParser = bodyParser.urlencoded({
     extended: false
 });
 
-var buffer = bufferFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip_custom.conf');
+var buffer = bufferFile('/etc/asterisk/sip_custom.conf');
 var myFile;
 var j = 0;
 
@@ -23,23 +26,6 @@ function encriptar(info){
     encrypt.hash(info,saltRounds,function(err,hash){
         if(err) throw err;
         return hash;
-    });
-    /*enigma.genHash(tamaño,'rl',info,function(err,hash){
-    if(err) throw err;
-    connect().query('UPDATE user set password=? where id=1',[hash],function (err, result) {
-            if (err) throw err;
-            console.log("Number of records inserted: " + result.affectedRows);
-    });
-    connect().end();
-
-    });*/
-}
-
-function checkPass(pass,hash){
-    encrypt.compare(pass,hash,function(err,res){
-        if(err) throw err;
-        console.log("pppaa",res);
-        return res;
     });
 }
 
@@ -85,13 +71,9 @@ var mysql = require('mysql');
 router.get('/', function(req, res, next) {
     var date = new Date();
     res.render('login',{veri:false});
-    /*res.render('index',
-        { title: myFile,
-            date: date});*/
 });
 
 router.post('/login', function(req, res, next) {
-   // status();
     var  username = req.body.username;
     var  pass     =  req.body.password;
     connect().query("Select * from user where username=?",[username],function(err,result){
@@ -121,10 +103,21 @@ router.get('/manageUser', function(req, res, next) {
     res.render('manageUsers');
 });
 
+router.get('/Trunks', function(req, res, next) {
+    trunkInf(res);
+    //res.render('Trunk-List',{trunkname:"prueba",saddress:"192.168.1.0",daddress:"10.0.0.20",status:"Ni idea"});
+});
+
 router.get('/ConfiguracionTrunk', function(req, res, next) {
     veriTrunk(res);
-   //res.render('Trunk-Configuration',{});
 });
+
+router.get('/ConfiguracionTrunk/applyConf', function(req, res, next) {
+    command.run('sudo asterisk -rx "core reload"');
+    mensajeApply = false;
+    res.redirect("/ConfiguracionTrunk");
+});
+
 
 router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
     var data = req.body;
@@ -137,15 +130,12 @@ router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
     });
+    writeFile();
     connect().end();
-    res.redirect("/");
+    res.redirect("/ConfiguracionTrunk");
 });
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
-    /*connect().query("delete from trunk where id_trunk= 1");
-    connect().query("delete from outgoing where id = 1");
-    connect().query("delete from incoming where id_in = 1");*/
-
     connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
@@ -156,18 +146,17 @@ router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) 
     });
     connect().query("INSERT INTO trunk VALUES (1,1,1)",function (error) {
          if(error) throw error;
-        writeFile();
     });
     connect().end();
-    res.redirect("/");
+    res.redirect("/ConfiguracionTrunk");
 });
 
 // funciones
 function connect(){
     return mysql.createConnection({
-        host: '192.168.1.50',
+        host: 'localhost',
         user: 'root',
-        password: 'l3nyluna13296',
+        password: 'rl2013',
         database: 'VGgateway',
         port: 3306
     });
@@ -190,18 +179,33 @@ function writeFile(){
            save(infoOut);
         });
     });
+    mensajeApply=true;
     connect().end();
 }
 
 function save(data){
-    fs.writeFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip_custom.conf',data,function(err) {
+    fs.writeFile('/etc/asterisk/sip_custom.conf',data,function(err) {
         if (err) {
             throw err;
         } else {
-            command.run('sudo asterisk -rx "core reload"');
             console.log('Guardado Satisfactoriamente');
         }
     });
+}
+
+function trunkInf(res){
+connect().query("Select trunk_name,host from outgoing", function(err,result){
+    if  (err) throw err;
+    Object.keys(result).forEach(function(key) {
+        var row = result[key];
+        command.get('asterisk -rx "sip show peer '+row.trunk_name+'"',function(err, data, stderr) {
+            var getStatus = cmdParser(data).between('Status', "\n").s;
+            var cleanUp = getStatus.split(':');
+            var trim = cleanUp[1].trim();
+            res.render('Trunk-List',{trunkname:row.trunk_name,saddress:myip.address(),daddress:row.host,status:trim});
+        });
+    });
+});
 }
 function veriTrunk(res){
     connect().query("Select * from trunk",function(err,result){
@@ -209,15 +213,20 @@ function veriTrunk(res){
             throw err;
         } else {
             if(result.length==0){
-                res.render('Trunk-Configuration',{modify:false});
+                res.render('Trunk-Configuration',{apply:false,modify:false});
             }else{
                 connect().query("Select o.username,o.trunk_name,o.fromuser,o.secret,o.port,o.type,o.host,i.username as userIn,i.secret as secretIn,i.context as contextIn,i.type as typeIn " +
                     "from trunk t inner join outgoing o on t.id_outgoing =o.id inner join incoming  i on i.id_in = t.id_incoming", function(err,result,fields) {
                     if (err) throw err;
                     Object.keys(result).forEach(function(key) {
                         var row = result[key];
-                        res.render('Trunk-configuration',{modify:true,trunknameS:row.trunk_name,hostS:row.host,usernameS:row.username,secretS:row.secret,
+                        if(mensajeApply==true){
+                        res.render('Trunk-Configuration',{apply:true,modify:true,trunknameS:row.trunk_name,hostS:row.host,usernameS:row.username,secretS:row.secret,
                             fromuserS:row.fromuser,portS:row.port,userInS:row.userIn,secretInS:row.secretIn});
+                        }else {
+                            res.render('Trunk-Configuration',{apply:false,modify:true,trunknameS:row.trunk_name,hostS:row.host,usernameS:row.username,secretS:row.secret,
+                                fromuserS:row.fromuser,portS:row.port,userInS:row.userIn,secretInS:row.secretIn});
+                        }
                     });
                 });
             }
@@ -226,30 +235,5 @@ function veriTrunk(res){
         connect().end();
     });
 }
-
-var shell = require('shelljs');
-function status(){
-   var statuu = shell.exec('sudo asterisk -rx "sip show peer TrunkToIssabel"',{async:true});
-   statuu.stdout.on('data',function(data){
-       console.log("prueba:"+data);
-   });
-
-    /* command.get('ls',function(err,data,stderr){
-        console.log("bueno: ",data);
-    });*/
-}
-/*router.post('/form', urlencodedParser, function(req, res) {
-    var data = req.body.trunk;
-    fs.writeFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip.conf',data,function(err) {
-        if (err) {
-            throw err;
-        } else {
-            console.log('Guardado Satisfactoriamente');
-            buffer = bufferFile('C:/Users/Leny96/Documents/Dc.Universidad/ProyectoFinal/sip.conf');
-            res.redirect('/');
-        }
-    });
-});*/
-
 
 module.exports = router;

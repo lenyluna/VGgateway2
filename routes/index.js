@@ -102,6 +102,9 @@ router.get('/inicio', function(req, res, next) {
 router.get('/manageUser', function(req, res, next) {
     res.render('manageUsers');
 });
+router.get('/device', function(req, res, next) {
+    res.render('Device');
+});
 
 router.get('/Trunks', function(req, res, next) {
     trunkInf(res);

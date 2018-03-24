@@ -159,12 +159,39 @@
 
                 <div class="row">
 
-                    <div class="col-lg-6">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <strong>Outgoing Settings</strong>
+                                <strong>Network Settings</strong>
                             </div>
-                            <div class="card-body card-block">
+                            <div class="card-body">
+                                <p>sh</p>
+                                <form action="" method="post"  class="form-horizontal">
+
+                                    <div class="row form-group">
+                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">IP Address DHCP: </label> </div>
+                                            <div class="col-12 col-md-9"><label class="switch switch-text switch-primary"><input type="checkbox" class="switch-input" checked="true">
+                                                    <span data-on="On" data-off="Off" class="switch-label"></span> <span class="switch-handle"></span></label></div>
+
+
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Trunk name</label></div>
+                                        <div class="col-12 col-md-9"><input type="text" id="text-input" name="trunkname"  class="form-control" placeholder="Example: TrunkToCentral" style="moz-placeholder: stalic"></div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Host</label></div>
+                                        <div class="col-12 col-md-9"><input type="text" id="text-input" name="host"  class="form-control" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" placeholder="Example: 192.168.1.1"></div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col col-md-3"><label for="password-input" class=" form-control-label">Username</label></div>
+                                        <div class="col-12 col-md-9"><input type="username" id="text-input" name="usernameT" class="form-control" placeholder="Example: UserA"></div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Password</label></div>
+                                        <div class="col-12 col-md-9"><input type="password" id="password-input" name="secret" class="form-control" placeholder="Example: VG$g@t3way$2018"></div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

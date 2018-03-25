@@ -99,6 +99,10 @@ router.get('/inicio', function(req, res, next) {
     res.render('manageUsers');
 });
 
+router.get('/Routes', function(req, res, next) {
+    res.render('Routes');
+});
+
 router.get('/manageUser', function(req, res, next) {
     res.render('manageUsers');
 });

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var app = express();
 var bodyParser = require('body-parser');
+var cleave = require('cleave.js');
 
 /* GET home page. */
 
@@ -100,7 +101,12 @@ router.get('/inicio', function(req, res, next) {
 });
 
 router.get('/Routes', function(req, res, next) {
-    res.render('Routes');
+    cleave = new Cleave('.input-delimiter', {
+        delimiter: '.',
+        blocks: [3, 3, 3],
+        uppercase: true
+    });
+    res.render('Routes', {formar: cleave});
 });
 
 router.get('/manageUser', function(req, res, next) {

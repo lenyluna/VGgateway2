@@ -101,12 +101,7 @@ router.get('/inicio', function(req, res, next) {
 });
 
 router.get('/Routes', function(req, res, next) {
-    cleave = new Cleave('.input-delimiter', {
-        delimiter: '.',
-        blocks: [3, 3, 3],
-        uppercase: true
-    });
-    res.render('Routes', {formar: cleave});
+    res.render('Routes');
 });
 
 router.get('/manageUser', function(req, res, next) {

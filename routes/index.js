@@ -12,7 +12,7 @@ var command = require('node-cmd');
 var mensajeApply = false;
 var myip = require('ip');
 var cmdParser = require('string');
-
+var  os = require('os');
 var urlencodedParser = bodyParser.urlencoded({
     extended: false
 });
@@ -22,6 +22,7 @@ var myFile;
 var j = 0;
 
 var encrypt = require('bcrypt');
+
 function encriptar(info){
     var saltRounds = 10;
     encrypt.hash(info,saltRounds,function(err,hash){
@@ -52,6 +53,7 @@ function formatString(data){
     data = arr.split(",");
     return data;
 }
+
 
 function bufferFile(myPath){
     return fs.readFile(myPath, 'utf-8', function(err, data){
@@ -108,10 +110,11 @@ router.get('/manageUser', function(req, res, next) {
     res.render('manageUsers');
 });
 router.get('/device', function(req, res, next) {
-    res.render('Device');
+    InterfaceInfo(res);
 });
 
 router.get('/Trunks', function(req, res, next) {
+    console.log("Prueba"+myip.address());
     trunkInf(res);
     //res.render('Trunk-List',{trunkname:"prueba",saddress:"192.168.1.0",daddress:"10.0.0.20",status:"Ni idea"});
 });
@@ -242,6 +245,14 @@ function veriTrunk(res){
         }
         connect().end();
     });
+}
+
+function InterfaceInfo(res){
+    var eth0 = os.getNetworkInterfaces().wlan0;
+    var ipAddress = eth0[0].address;
+    var mask  = eth0[0].netmask;
+   // var gateway //falta gateway
+    res.render('Device',{ip:ipAddress,net:mask});
 }
 
 module.exports = router;

@@ -32,7 +32,7 @@
                                 <div class="col-12 col-md-9">
                                     <label class="switch switch-3d switch-primary mr-3"><input type="checkbox"
                                                                                                class="switch-input"
-                                                                                               checked="false" onclick="javascript:validar(this);" >
+                                                                                               onclick="javascript:validar(this);" >
                                         <span class="switch-label"></span><span class="switch-handle"></span></label>
                                 </div>
                             </div>
@@ -41,19 +41,19 @@
                                         Address</label></div>
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="address"
                                                                     class="form-control"
-                                                                    style="moz-placeholder: stalic" disabled/></div>
+                                                                    style="moz-placeholder: stalic" value="<%= ip %>"/></div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="password-input" class=" form-control-label">Netmask</label>
                                 </div>
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="netmask"
-                                                                    class="form-control" disabled/></div>
+                                                                    class="form-control" value="<%=net %>" /></div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input" class=" form-control-label">Default
                                         Gateway</label></div>
                                 <div class="col-12 col-md-9"><input type="text" id="password-input" name="defaultg"
-                                                                    class="form-control" disabled/></div>
+                                                                    class="form-control" /></div>
                             </div>
                         </form>
                     </div>

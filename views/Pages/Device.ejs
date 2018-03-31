@@ -25,12 +25,13 @@
                         <strong>Network Settings</strong>
                     </div>
                     <div class="card-body card-block">
-                        <form name="form" action="" method="post" class="form-horizontal">
+                        <form name="form" action="/device/guardar" method="post" class="form-horizontal">
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input"
                                                                  class=" form-control-label">DHCP </label></div>
                                 <div class="col-12 col-md-9">
                                     <label class="switch switch-3d switch-primary mr-3"><input type="checkbox"
+                                                                                               name="isDHCP"
                                                                                                class="switch-input"
                                                                                                onclick="javascript:validar(this);" >
                                         <span class="switch-label"></span><span class="switch-handle"></span></label>
@@ -55,11 +56,28 @@
                                 <div class="col-12 col-md-9"><input type="text" id="password-input" name="defaultg"
                                                                     class="form-control" /></div>
                             </div>
-                        </form>
+
+
                     </div>
                 </div>
             </div>
+            <div class="breadcrumbs">
+                <div class="col-sm-12">
+                    <div class="page-header float-right">
+                        <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 10px"><i
+                                    class="fa fa-check"></i> Modify
+                        </button>
 
+            </form>
+
+                        <a href="/inicio">
+                            <button type="submit" class="btn btn-danger btn-sm" style="margin-top: 10px"><i class="fa fa-times"></i> Cancel
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div><!-- .content -->
         </div><!-- /#right-panel -->
 
         <!-- Right Panel -->

@@ -12,7 +12,8 @@ var command = require('node-cmd');
 var mensajeApply = false;
 var myip = require('ip');
 var cmdParser = require('string');
-var  os = require('os');
+var  os = require('os'); //para leer la direccion ip del VG gateway
+var setup = require ('setup')(); //para poner la configuracion de la ip
 var urlencodedParser = bodyParser.urlencoded({
     extended: false
 });
@@ -111,10 +112,10 @@ router.get('/manageUser', function(req, res, next) {
 });
 router.get('/device', function(req, res, next) {
     InterfaceInfo(res);
+
 });
 
 router.get('/Trunks', function(req, res, next) {
-    console.log("Prueba"+myip.address());
     trunkInf(res);
     //res.render('Trunk-List',{trunkname:"prueba",saddress:"192.168.1.0",daddress:"10.0.0.20",status:"Ni idea"});
 });
@@ -162,6 +163,33 @@ router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) 
     res.redirect("/ConfiguracionTrunk");
 });
 
+router.post('/device/guardar',function(req, res, next) {
+    var data = req.body;
+    console.log(data);
+    if(data.isDHCP=='on'){
+        var interfaces= setup.network.config({
+            eth0: {
+                auto: true,
+                dhcp: true
+            }
+        });
+    }else {
+        var interfaces= setup.network.config({
+            eth0: {
+                auto: true,
+                ipv4: {
+                    address: data.address,
+                    netmask: data.netmask,
+                    gateway: data.defaultg
+                }
+            }
+        });
+    }
+
+    setup.network.save(interfaces);
+    setup.network.restart();
+    res.redirect("/device");
+});
 // funciones
 function connect(){
     return mysql.createConnection({

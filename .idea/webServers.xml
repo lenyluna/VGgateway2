@@ -10,6 +10,14 @@
           <option name="port" value="21" />
         </fileTransfer>
       </webServer>
+      <webServer id="031d853c-9d5b-4b2d-81b3-9253b30234db" name="VGGatewayLuna" url="http://192.168.1.23">
+        <fileTransfer anonymous="true" host="192.168.1.23" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

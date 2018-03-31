@@ -6,13 +6,16 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "~1.18.2",
     "cleave.js": "^1.2.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "ejs": "~2.5.7",
     "express": "~4.15.5",
+    "ip": "^1.1.5",
     "morgan": "~1.9.0",
+    "node-mysql": "^0.4.2",
     "os": "^0.1.1",
     "serve-favicon": "~2.4.5",
     "setup": "0.0.3",

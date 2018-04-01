@@ -13,7 +13,8 @@ var mensajeApply = false;
 var myip = require('ip');
 var cmdParser = require('string');
 var  os = require('os'); //para leer la direccion ip del VG gateway
-var setup = require ('setup')(); //para poner la configuracion de la ip
+var setup = require ('setup'); //para poner la configuracion de la ip
+var mysql = require('mysql');
 var urlencodedParser = bodyParser.urlencoded({
     extended: false
 });
@@ -68,7 +69,7 @@ function bufferFile(myPath){
 }
 
 
-var mysql = require('mysql');
+
 
 
 // comment
@@ -86,6 +87,7 @@ router.post('/login', function(req, res, next) {
             var row = result[key];
             encrypt.compare(pass,row.password,function(err,respuesta){
                 if(err) throw err;
+                console.log(row.password);
                 if (result.length==1 && respuesta ) {
                     console.log("Login satisfactorio");
                     res.render('manageUsers');
@@ -197,7 +199,8 @@ function connect(){
         user: 'root',
         password: 'rl2013',
         database: 'VGgateway',
-        port: 3306
+        port: 3306,
+        insecureAuth : true
     });
 }
 

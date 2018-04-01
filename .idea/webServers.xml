@@ -2,7 +2,7 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="2a1f79bd-07e1-4b18-8283-54888fc9f877" name="VGGatewayLuna" url="http://192.168.2.5">
+      <webServer id="85484f41-b0e2-4914-87a8-668a17e49c17" name="VGgatewayNitido" url="http://192.168.2.5">
         <fileTransfer host="192.168.2.5" port="21" rootFolder="/Proyecto">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />

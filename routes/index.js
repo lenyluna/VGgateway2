@@ -68,10 +68,6 @@ function bufferFile(myPath){
     });
 }
 
-
-
-
-
 // comment
 router.get('/', function(req, res, next) {
     var date = new Date();
@@ -101,6 +97,7 @@ router.post('/login', function(req, res, next) {
     });
 
 });
+
 router.get('/inicio', function(req, res, next) {
     res.render('manageUsers');
 });
@@ -112,6 +109,7 @@ router.get('/Routes', function(req, res, next) {
 router.get('/manageUser', function(req, res, next) {
     res.render('manageUsers');
 });
+
 router.get('/device', function(req, res, next) {
     InterfaceInfo(res);
 
@@ -124,14 +122,13 @@ router.get('/Trunks', function(req, res, next) {
 
 router.get('/ConfiguracionTrunk', function(req, res, next) {
     veriTrunk(res);
-});
+})
 
 router.get('/ConfiguracionTrunk/applyConf', function(req, res, next) {
     command.run('sudo asterisk -rx "core reload"');
     mensajeApply = false;
     res.redirect("/ConfiguracionTrunk");
 });
-
 
 router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
     var data = req.body;
@@ -189,9 +186,11 @@ router.post('/device/guardar',function(req, res, next) {
     }
 
     setup.network.save(interfaces);
-    setup.network.restart();
+    command.run('/etc/init.d/networking reload');
+    command.run('reboot');
     res.redirect("/device");
 });
+
 // funciones
 function connect(){
     return mysql.createConnection({

@@ -39,7 +39,7 @@
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="trunkname"
                                                                     class="form-control"
                                                                     placeholder="Example: TrunkToCentral"
-                                                                    style="moz-placeholder: stalic"></div>
+                                                                    style="moz-placeholder: stalic" required></div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input"
@@ -47,13 +47,13 @@
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="host"
                                                                     class="form-control"
                                                                     pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$"
-                                                                    placeholder="Example: 192.168.1.1"></div>
+                                                                    placeholder="Example: 192.168.1.1" required></div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="password-input" class=" form-control-label">Username</label>
                                 </div>
                                 <div class="col-12 col-md-9"><input type="username" id="text-input" name="usernameT"
-                                                                    class="form-control" placeholder="Example: UserA">
+                                                                    class="form-control" placeholder="Example: UserA" required>
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -61,19 +61,19 @@
                                                                  class=" form-control-label">Password</label></div>
                                 <div class="col-12 col-md-9"><input type="password" id="password-input" name="secret"
                                                                     class="form-control"
-                                                                    placeholder="Example: VG$g@t3way$2018"></div>
+                                                                    placeholder="Example: VG$g@t3way$2018" required></div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input"
                                                                  class=" form-control-label">From-User</label></div>
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="fromuser"
-                                                                    class="form-control"></div>
+                                                                    class="form-control" required></div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input"
                                                                  class=" form-control-label">Port</label></div>
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="port"
-                                                                    class="form-control" placeholder="Example: 5060">
+                                                                    class="form-control" placeholder="Example: 5060" required>
                                 </div>
                             </div>
                     </div>
@@ -90,14 +90,14 @@
                             <div class="col col-md-3"><label for="text-input"
                                                              class=" form-control-label">Username</label></div>
                             <div class="col-12 col-md-9"><input type="text" id="text-input" name="usernameI"
-                                                                class="form-control" placeholder="Example: UserB"></div>
+                                                                class="form-control" placeholder="Example: UserB" required></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="password-input"
                                                              class=" form-control-label">Password</label></div>
                             <div class="col-12 col-md-9"><input type="password" id="password-input" name="passwordI"
                                                                 class="form-control"
-                                                                placeholder="Example: VG$g@t3way$2018"></div>
+                                                                placeholder="Example: VG$g@t3way$2018" required></div>
                         </div>
 
                     </div>
@@ -119,33 +119,33 @@
         <div class="col col-md-3"><label for="text-input" class=" form-control-label">Trunk name</label></div>
         <div class="col-12 col-md-9"><input type="text" id="text-input" name="trunkname" class="form-control"
                                             placeholder="Example: TrunkToCentral" style="moz-placeholder: stalic"
-                                            value="<%= trunknameS %>"></div>
+                                            value="<%= trunknameS %>" required></div>
     </div>
     <div class="row form-group">
         <div class="col col-md-3"><label for="text-input" class=" form-control-label">Host</label></div>
         <div class="col-12 col-md-9"><input type="text" id="text-input" name="host" class="form-control"
                                             pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$"
-                                            placeholder="Example: 192.168.1.1" value="<%= hostS %>"></div>
+                                            placeholder="Example: 192.168.1.1" value="<%= hostS %>" required></div>
     </div>
     <div class="row form-group">
         <div class="col col-md-3"><label for="password-input" class=" form-control-label">Username</label></div>
         <div class="col-12 col-md-9"><input type="username" id="text-input" name="usernameT" class="form-control"
-                                            placeholder="Example: UserA" value="<%= usernameS %>"></div>
+                                            placeholder="Example: UserA" value="<%= usernameS %>" required></div>
     </div>
     <div class="row form-group">
         <div class="col col-md-3"><label for="text-input" class=" form-control-label">Password</label></div>
         <div class="col-12 col-md-9"><input type="text" id="password-input" name="secret" class="form-control"
-                                            placeholder="Example: VG$g@t3way$2018" value="<%= secretS %>"></div>
+                                            placeholder="Example: VG$g@t3way$2018" value="<%= secretS %>" required></div>
     </div>
     <div class="row form-group">
         <div class="col col-md-3"><label for="text-input" class=" form-control-label">From-User</label></div>
         <div class="col-12 col-md-9"><input type="text" id="text-input" name="fromuser" class="form-control"
-                                            value="<%= fromuserS %>"></div>
+                                            value="<%= fromuserS %>" required></div>
     </div>
     <div class="row form-group">
         <div class="col col-md-3"><label for="text-input" class=" form-control-label">Port</label></div>
         <div class="col-12 col-md-9"><input type="text" id="text-input" name="port" class="form-control"
-                                            placeholder="Example: 5060" value="<%= portS %>"></div>
+                                            placeholder="Example: 5060" value="<%= portS %>" required></div>
     </div>
 
     </div>

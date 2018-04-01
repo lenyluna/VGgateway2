@@ -10,6 +10,8 @@ var fs = require('fs');
 var path = require('path');
 var command = require('node-cmd');
 var mensajeApply = false;
+var applyRoute = false;
+var modifyRoute = false;
 var myip = require('ip');
 var cmdParser = require('string');
 var  os = require('os'); //para leer la direccion ip del VG gateway
@@ -86,6 +88,7 @@ router.post('/login', function(req, res, next) {
                     console.log("Informaciones incorrectas");
                     res.render('login', {user: username, veri: true});
                 }
+        connect().end();
     });
 });
 
@@ -93,13 +96,56 @@ router.get('/inicio', function(req, res, next) {
     res.render('Device');
 });
 
-router.get('/Routes', function(req, res, next) {
-    res.render('Routes', {mod2: false});
+router.get('/changePass', function(req, res, next) {
+    res.render('ChangePassword');
 });
 
-router.post('/Routes/modify', function(req, res, next) {
-    res.render('Routes', {mod2: true});
+router.get('/Routes', function(req, res, next) {
+   checkNloadRoute(res);
 });
+
+router.post('/saveRoutes', urlencodedParser, function(req, res, next) {
+    var getData = req.body;
+    var number = parsePhoneNum(getData.phoneNum);
+    connect().query('insert into routes values (?,?,?,?,?)', [1,getData.trunkName, getData.dialPattern, number, getData.redirect], function (err,result) {
+        if (err) throw err;
+        console.log("Number of records inserted: " + result.affectedRows);
+        connect().end();
+    });
+    connect().query('select id_trunk from trunk', function (err,result) {
+        if (err) throw err;
+        if(result.length != 0){
+            connect().query('insert into trunkRoute values (?,?,?)',[1,1,1], function (err,result) {
+                if (err) throw err;
+                console.log("Number of records inserted: " + result.affectedRows);
+                connect().end();
+            });
+        }
+        else{
+            console.log("No se ha Creado el Trunk!");
+        }
+        connect().end();
+    });
+    modifyRoute = true;
+    applyRoute = true;
+    console.log(number + getData.dialPattern + getData.trunkName + getData.redirect);
+    res.render('Routes', {modify:modifyRoute,apply: applyRoute});
+});
+
+router.post('/modifyRoutes', urlencodedParser, function(req, res, next) {
+    var getData = req.body;
+    var number = parsePhoneNum(getData.phoneNum);
+    connect().query('update routes set trunkName = ?, dialPattern = ?, phoneNum = ?, redirect = ? where id = 1', [getData.trunkName, getData.dialPattern, number, getData.redirect], function (err,result) {
+        if (err) throw err;
+        console.log("Number of records inserted: " + result.affectedRows);
+        connect().end();
+    });
+    modifyRoute = true;
+    applyRoute = true;
+    console.log(number + getData.dialPattern + getData.trunkName + getData.redirect);
+    checkNloadRoute(res);
+});
+
 
 router.get('/manageUser', function(req, res, next) {
     loadListUser (res);
@@ -117,7 +163,7 @@ router.get('/Trunks', function(req, res, next) {
 
 router.get('/ConfiguracionTrunk', function(req, res, next) {
     veriTrunk(res);
-})
+});
 
 router.get('/ConfiguracionTrunk/applyConf', function(req, res, next) {
     command.run('sudo asterisk -rx "core reload"');
@@ -131,13 +177,15 @@ router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
         [data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,data.host],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
+        connect().end();
     });
-    connect().query('UPDATE incoming set username=?,secret=? where id_in=1',[data.usernameI,data.passwordI],function (err, result) {
+    connect().query('UPDATE incoming set username=?,secret=? where id=1',[data.usernameI,data.passwordI],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
+        connect().end();
     });
     writeFile();
-    connect().end();
+
     res.redirect("/ConfiguracionTrunk");
 });
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
@@ -145,15 +193,34 @@ router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) 
     connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
+        connect().end();
     });
+
     connect().query('INSERT INTO incoming VALUES (?,?,?,?,?)',[1,data.usernameI,data.passwordI,'from-trunk','peer'],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
+        connect().end();
     });
+
     connect().query("INSERT INTO trunk VALUES (1,1,1)",function (error) {
-         if(error) throw error;
+        if(error) throw error;
+        connect().end();
     });
-    connect().end();
+
+    connect().query("select id from routes",function (error, result) {
+        if(error) throw error;
+        if(result.length != 0){
+            connect().query("INSERT INTO trunkRoute VALUES (1,1,1)",function (error) {
+                if(error) throw error;
+            });
+        }
+        else{
+            console.log("No se ha creado la Ruta !!");
+        }
+        connect().end();
+    });
+
+    mensajeApply = true;
     res.redirect("/ConfiguracionTrunk");
 });
 
@@ -186,6 +253,15 @@ router.post('/device/guardar',function(req, res, next) {
 
 
 // funciones
+function parsePhoneNum(phoneNum) {
+    var split1 = phoneNum.split('(');
+    var split2 = split1[1].split(')');
+    var split3 = split2[1].split(' ');
+    var split4 = split3[1].split('-');
+    var parsedNumber = split2[0]+split4[0] +split4[1];
+    return parsedNumber;
+}
+
 function connect(){
     return mysql.createConnection({
         host: 'localhost',
@@ -201,7 +277,7 @@ function writeFile(){
      var infoOut ="";
     save(infoOut);
     connect().query("Select o.username,o.trunk_name,o.fromuser,o.secret,o.port,o.type,o.host,i.username as userIn,i.secret as secretIn,i.context as contextIn,i.type as typeIn " +
-        "from trunk t inner join outgoing o on t.id_outgoing =o.id inner join incoming  i on i.id_in = t.id_incoming", function(err,result,fields) {
+        "from trunk t inner join outgoing o on t.id_outgoing =o.id inner join incoming  i on i.id = t.id_incoming", function(err,result,fields) {
         if (err) throw err;
        Object.keys(result).forEach(function(key) {
             var row = result[key];
@@ -241,6 +317,27 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
         });
     });
 });
+connect().end();
+}
+
+function checkNloadRoute(res) {
+    connect().query('select id from routes', function (err,result) {
+        if (err) throw err;
+        if (result.length != 0) {
+            connect().query('select trunkName,dialPattern,phoneNum,redirect from routes;', function (err,result) {
+                Object.keys(result).forEach(function(key) {
+                    var row = result[key];
+                    console.log("To la droga: " + row.trunkName +"\n"+ row.dialPattern +"\n"+ row.phoneNum +"\n"+ row.redirect+"\n");
+                    res.render('Routes',{modify:false,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,redirect:row.redirect});
+                });
+                connect().end();
+            });
+        }
+        else{
+            res.render('Routes',{modify:modifyRoute,apply:applyRoute});
+        }
+        connect().end();
+    });
 }
 function veriTrunk(res){
     connect().query("Select * from trunk",function(err,result){
@@ -251,7 +348,7 @@ function veriTrunk(res){
                 res.render('Trunk-Configuration',{apply:false,modify:false});
             }else{
                 connect().query("Select o.username,o.trunk_name,o.fromuser,o.secret,o.port,o.type,o.host,i.username as userIn,i.secret as secretIn,i.context as contextIn,i.type as typeIn " +
-                    "from trunk t inner join outgoing o on t.id_outgoing =o.id inner join incoming  i on i.id_in = t.id_incoming", function(err,result,fields) {
+                    "from trunk t inner join outgoing o on t.id_outgoing =o.id inner join incoming  i on i.id = t.id_incoming", function(err,result,fields) {
                     if (err) throw err;
                     Object.keys(result).forEach(function(key) {
                         var row = result[key];
@@ -269,6 +366,7 @@ function veriTrunk(res){
         }
         connect().end();
     });
+    connect().end();
 }
 
 function InterfaceInfo(res){
@@ -284,5 +382,6 @@ function loadListUser (res){
         if (err) throw err;
         res.render('manageUsers',{list:result});
     });
+    connect().end();
 }
 module.exports = router;

@@ -94,7 +94,11 @@ router.get('/inicio', function(req, res, next) {
 });
 
 router.get('/Routes', function(req, res, next) {
-    res.render('Routes');
+    res.render('Routes', {mod2: false});
+});
+
+router.post('/Routes/modify', function(req, res, next) {
+    res.render('Routes', {mod2: true});
 });
 
 router.get('/manageUser', function(req, res, next) {

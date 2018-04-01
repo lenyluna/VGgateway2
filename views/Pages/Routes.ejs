@@ -3,77 +3,91 @@
 <!-- Left Panel -->
 <% include ../Partials/header %>
 
-    <div class="breadcrumbs">
-        <div class="col-sm-4">
-            <div class="page-header float-left">
-                <div class="page-title">
-                    <h1>Call Routes</h1>
-                </div>
+
+<div class="breadcrumbs">
+    <div class="col-sm-4">
+        <div class="page-header float-left">
+            <div class="page-title">
+                <h1>Call Routes</h1>
             </div>
         </div>
     </div>
+</div>
 
+<% if(mod2 == true){ %>
+<div class="col-sm-12">
+    <div class="sufee-alert alert with-close alert-danger alert-dismissible fade show" role="alert" align="center">
+        <a href="/device"> Apply Config </a>
+    </div>
+</div>
+<% } %>
+<form action="/Routes/modify" method="post" class="form-horizontal">
     <div class="animated fadeIn">
         <div class="col-lg-6">
             <div class="card">
+
                 <div class="card-header">
                     <strong>Route to Phone</strong>
                 </div>
                 <div class="card-body card-block">
-                    <form action="/Routes/applyRoutes" method="post" enctype="multipart/form-data" class="form-horizontal">
-                        <div class="row form-group">
-                            <div class="col col-md-3"><label for="text-input" class=" form-control-label">Phone Num.</label>
-                            </div>
-                            <div class="col-12 col-md-9"><input class ="input-phone form-control" type="text" id="text-input" name="text-input"
-                                                                placeholder="(XXX) XXX-XXXX">
+                    <div class="row form-group">
+                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Phone Num.</label>
+                        </div>
+                        <div class="col-12 col-md-9"><input class="input-phone form-control" type="text" id="text-input"
+                                                            name="text-input"
+                                                            placeholder="(XXX) XXX-XXXX">
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Dial Pattern<i
+                                        data-toggle="modal" data-target="#largeModal" style="margin-left: 2.1px;"
+                                        class="menu-icon fa fa-question-circle"></i></label>
+                        </div>
+
+                        <div class="modal fade" id="largeModal" tabindex="-1" role="dialog"
+                             aria-labelledby="largeModalLabel" style="display: none;" aria-hidden="true">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="largeModalLabel">Large Modal</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>
+                                            There are three species of zebras: the plains zebra, the mountain zebra and
+                                            the Grévy's zebra. The plains zebra
+                                            and the mountain zebra belong to the subgenus Hippotigris, but Grévy's zebra
+                                            is the sole species of subgenus
+                                            Dolichohippus. The latter resembles an ass, to which it is closely related,
+                                            while the former two are more
+                                            horse-like. All three belong to the genus Equus, along with other living
+                                            equids.
+                                        </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary">Cancel</button>
+                                        <button type="button" class="btn btn-primary">Confirm</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                       <div class="row form-group">
-                           <div class="col col-md-3"><label for="text-input" class=" form-control-label">Dial Pattern<i data-toggle="modal" data-target="#largeModal" style="margin-left: 2.1px;" class="menu-icon fa fa-question-circle"></i></button></label>
-                            </div>
+                        <div class="col-12 col-md-9"><input type="text" id="text-input" name="text-input"
+                                                            placeholder="_809581XXX" class="form-control">
+                        </div>
+                    </div>
 
-                           <div class="modal fade" id="largeModal" tabindex="-1" role="dialog" aria-labelledby="largeModalLabel" style="display: none;" aria-hidden="true">
-                               <div class="modal-dialog modal-lg" role="document">
-                                   <div class="modal-content">
-                                       <div class="modal-header">
-                                           <h5 class="modal-title" id="largeModalLabel">Large Modal</h5>
-                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                               <span aria-hidden="true">×</span>
-                                           </button>
-                                       </div>
-                                       <div class="modal-body">
-                                           <p>
-                                               There are three species of zebras: the plains zebra, the mountain zebra and the Grévy's zebra. The plains zebra
-                                               and the mountain zebra belong to the subgenus Hippotigris, but Grévy's zebra is the sole species of subgenus
-                                               Dolichohippus. The latter resembles an ass, to which it is closely related, while the former two are more
-                                               horse-like. All three belong to the genus Equus, along with other living equids.
-                                           </p>
-                                       </div>
-                                       <div class="modal-footer">
-                                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                           <button type="button" class="btn btn-primary">Confirm</button>
-                                       </div>
-                                   </div>
-                               </div>
-                           </div>
-                            <div class="col-12 col-md-9"><input type="text" id="text-input" name="text-input"
-                                                                placeholder="_809581XXX" class="form-control">
-                            </div>
-                       </div>
-
-                        <!--       <div class="row form-group">
-                                 <div class="col col-md-3"><label for="text-input" class=" form-control-label">Text
-                                         Input</label>
-                                 </div>
-                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="text-input"
-                                                                     placeholder="Text" class="form-control">
-                                     <small class="form-text text-muted">This is a help text</small>
-                                 </div>
-                             </div>-->
-                    </form>
-
+                    <!--       <div class="row form-group">
+                             <div class="col col-md-3"><label for="text-input" class=" form-control-label">Text
+                                     Input</label>
+                             </div>
+                             <div class="col-12 col-md-9"><input type="text" id="text-input" name="text-input"
+                                                                 placeholder="Text" class="form-control">
+                                 <small class="form-text text-muted">This is a help text</small>
+                             </div>
+                         </div>-->
                 </div>
-
             </div>
         </div>
 
@@ -83,22 +97,22 @@
                     <strong>Route from Phone</strong>
                 </div>
                 <div class="card-body card-block">
-                    <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                        <div class="row form-group">
-                            <div class="col col-md-3"><label for="text-input" class=" form-control-label">Trunk Name</label>
-                            </div>
-                            <div class="col-12 col-md-9"><input type="text" id="text-input" name="text-input"
-                                                                placeholder="TrunkToVGG" class="form-control">
-                            </div>
+
+                    <div class="row form-group">
+                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Trunk Name</label>
                         </div>
-                        <div class="row form-group">
-                            <div class="col col-md-3"><label for="text-input" class=" form-control-label">Redirect to</label>
-                            </div>
-                            <div class="col-12 col-md-9"><input type="text" id="text-input" name="text-input"
-                                                                placeholder="Extension Number" class="form-control">
-                            </div>
+                        <div class="col-12 col-md-9"><input type="text" id="text-input" name="text-input"
+                                                            placeholder="TrunkToVGG" class="form-control">
                         </div>
-                    </form>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Redirect
+                                to</label>
+                        </div>
+                        <div class="col-12 col-md-9"><input type="text" id="text-input" name="text-input"
+                                                            placeholder="Extension Number" class="form-control">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -109,7 +123,7 @@
                     <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 10px"><i
                                 class="fa fa-check"></i> Modify
                     </button>
-
+                    </form>
                     <a href="/inicio">
                         <button type="submit" class="btn btn-danger btn-sm" style="margin-top: 10px"><i
                                     class="fa fa-times"></i> Cancel
@@ -119,16 +133,15 @@
             </div>
         </div>
     </div>
-
 <% include ../Partials/footer %>
 <script src="assets/js/cleave.js"></script>
 <script type="text/javascript">
 
     document.addEventListener('DOMContentLoaded', function () {
         var cleave = new Cleave('.input-phone', {
-           // prefix: '(',
-            delimiters: ['(',') ', '-'],
-            blocks: [0,3, 3, 4]
+            // prefix: '(',
+            delimiters: ['(', ') ', '-'],
+            blocks: [0, 3, 3, 4]
         });
     });
 

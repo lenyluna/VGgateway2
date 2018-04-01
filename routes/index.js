@@ -77,29 +77,20 @@ router.get('/', function(req, res, next) {
 router.post('/login', function(req, res, next) {
     var  username = req.body.username;
     var  pass     =  req.body.password;
-    connect().query("Select * from user where username=?",[username],function(err,result){
+    connect().query("Select * from user where username=? and password=?",[username,pass],function(err,result){
         if(err) throw err;
-        Object.keys(result).forEach(function(key) {
-            var row = result[key];
-            encrypt.compare(pass,row.password,function(err,respuesta){
-                if(err) throw err;
-                console.log(row.password);
-                if (result.length==1 && respuesta ) {
+                if (result.length==1) {
                     console.log("Login satisfactorio");
-                    res.render('manageUsers');
+                    res.render('index');
                 } else {
                     console.log("Informaciones incorrectas");
                     res.render('login', {user: username, veri: true});
                 }
-            });
-        });
-
     });
-
 });
 
 router.get('/inicio', function(req, res, next) {
-    res.render('manageUsers');
+    res.render('Device');
 });
 
 router.get('/Routes', function(req, res, next) {
@@ -107,7 +98,7 @@ router.get('/Routes', function(req, res, next) {
 });
 
 router.get('/manageUser', function(req, res, next) {
-    res.render('manageUsers');
+    loadListUser (res);
 });
 
 router.get('/device', function(req, res, next) {
@@ -164,7 +155,6 @@ router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) 
 
 router.post('/device/guardar',function(req, res, next) {
     var data = req.body;
-    console.log(data);
     if(data.isDHCP=='on'){
         var interfaces= setup.network.config({
             eth0: {
@@ -184,7 +174,6 @@ router.post('/device/guardar',function(req, res, next) {
             }
         });
     }
-
     setup.network.save(interfaces);
     command.run('/etc/init.d/networking reload');
     command.run('reboot');
@@ -285,4 +274,10 @@ function InterfaceInfo(res){
     res.render('Device',{ip:ipAddress,net:mask});
 }
 
+function loadListUser (res){
+    connect().query("Select * from user",function(err,result){
+        if (err) throw err;
+        res.render('manageUsers',{list:result});
+    });
+}
 module.exports = router;

@@ -12,16 +12,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-8">
-                <div class="page-header float-right">
-                    <div class="page-title">
-                        <ol class="breadcrumb text-right">
-                            <li>Settings</li>
-                            <li>Manage Users</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="content mt-3">
@@ -29,21 +19,37 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="card">
-                    <div class="card-newUserheader">
-                      <button type="button" class="btn btn-success" onclick="javascript:mostrar();"><i class="fa fa-magic" ></i>&nbsp; Create User</button>
-                      <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i>&nbsp; Delete user</button>
+                    <div id="dNolmal" class="card-newUserheader">
+                      <button id="btnCreate" type="button" class="btn btn-success" onclick="javascript:mostrar();"><i class="fa fa-magic" ></i>&nbsp; Create User</button>
+                        <button id="btnDelete" type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i>&nbsp; Delete user</button>
                     </div>
+                      <div id="dadd" class="card-newUserheader" style='display:none;'>
+                          <form action="/" method="post" class="form-horizontal" >
+                          <button type="submit" class="btn btn-success"><i class="fa fa-plus" ></i>&nbsp;Add User</button>
+                          <button  type="reset" class="btn btn-danger"  onclick="javascript:original();"><i class="fa fa-times"></i>&nbsp;Cancel</button>
+                      </div>
                   </div>
                 </div>
               </div>
 
                 <div id="prueba" style='display:none;'>
-                    <div class="row">
+                    <div class="row" >
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <form action="/" method="post" class="form-horizontal" >
-                                        <input type="text" name="username" class="form-control"/>
+                                        <div class="col col-md-1"><label for="text-input" class=" form-control-label">Username</label></div>
+                                        <div class=" col-md-2"><input type="text" name="username" class="form-control" style="height: 25px"/></div>
+                                        <div class="col col-md-1"><label for="text-input" class=" form-control-label">Password</label></div>
+                                        <div class="col-md-2 " ><input type="text" name="pass" class="form-control" style="height: 25px"/></div>
+                                        <div class="col col-md-1"><label for="text-input" class=" form-control-label">Confirm </label></div>
+                                        <div class="col-md-2 " ><input type="text" name="confirm" class="form-control" style="height: 25px"/></div>
+                                        <div class="col col-md-1"><label for="text-input" class=" form-control-label">Privilege</label></div>
+                                        <div class="col-md-2">
+                                            <select data-placeholder="Choose a Country..." class="standardSelect" tabindex="2" name="privilegio">
+                                                <option value="Administrador">Administrador</option>
+                                                <option value="Reportes">Solo lectura</option>
+                                            </select>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -68,6 +74,7 @@
                       </tr>
                     </thead>
                     <tbody>
+
                     <%for(var i=0; i<list.length;i++){%>
                       <tr>
                         <td><%=list[i].username%></td>
@@ -89,6 +96,15 @@
 
     <!-- Right Panel -->
 <% include ../Partials/footer %>
-
+<script>
+    jQuery(document).ready(function() {
+        jQuery(".standardSelect").chosen({
+            disable_search_threshold: 10,
+            no_results_text: "Oops, nothing found!",
+            width: "100%"
+        });
+    });
+</script>
 </body>
+<script src="assets/js/myJS.js" type="text/javascript"> </script>
 </html>

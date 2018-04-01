@@ -14,4 +14,13 @@ if(obj.checked==true){
 
 function mostrar(){
     document.getElementById('prueba').style.display='block';
+    document.getElementById('dNolmal').style.display='none';
+    document.getElementById('dadd').style.display='block';
+
+}
+
+function original(){
+    document.getElementById('prueba').style.display='none';
+    document.getElementById('dNolmal').style.display='block';
+    document.getElementById('dadd').style.display='none';
 }

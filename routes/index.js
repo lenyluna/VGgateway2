@@ -184,6 +184,7 @@ router.post('/device/guardar',function(req, res, next) {
     res.redirect("/device");
 });
 
+
 // funciones
 function connect(){
     return mysql.createConnection({

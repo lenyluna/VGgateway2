@@ -11,3 +11,7 @@ if(obj.checked==true){
 }
 
 }
+
+function mostrar(){
+    document.getElementById('prueba').style.display='block';
+}

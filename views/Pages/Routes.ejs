@@ -6,7 +6,7 @@
 <% if(apply){ %>
 <div class="col-sm-12">
     <div class="sufee-alert alert with-close alert-danger alert-dismissible fade show" role="alert" align="center">
-        <a href="/device"> Apply Config </a>
+        <a href="/applyRoutes"> Apply Config </a>
     </div>
 </div>
 <% } %>
@@ -134,7 +134,7 @@
                                                                 id="text-input"
                                                                 name="phoneNum"
                                                                 placeholder="(XXX) XXX-XXXX"
-                                                                value="<%=phoneNum%>">
+                                                                value="<%= phoneNum %>">
                             </div>
                         </div>
                         <div class="row form-group">
@@ -176,7 +176,8 @@
                                 </div>
                             </div>
                             <div class="col-12 col-md-9"><input type="text" id="text-input" name="dialPattern"
-                                                                placeholder="_809581XXX" class="form-control" value="<%=dialPattern%>">
+                                                                placeholder="_809581XXX" class="form-control"
+                                                                value="<%= dialPattern %>">
                             </div>
                         </div>
 
@@ -206,7 +207,8 @@
                                     Name</label>
                             </div>
                             <div class="col-12 col-md-9"><input type="text" id="text-input" name="trunkName"
-                                                                placeholder="TrunkToVGG" class="form-control" value="<%=trunkName%>">
+                                                                placeholder="TrunkToVGG" class="form-control"
+                                                                value="<%= trunkName %>">
                             </div>
                         </div>
                         <div class="row form-group">
@@ -214,7 +216,8 @@
                                     to</label>
                             </div>
                             <div class="col-12 col-md-9"><input type="text" id="text-input" name="redirect"
-                                                                placeholder="Extension Number" class="form-control" value="<%=redirect%>">
+                                                                placeholder="Extension Number" class="form-control"
+                                                                value="<%= redirect %>">
                             </div>
                         </div>
                     </div>
@@ -234,15 +237,16 @@
                                     class="fa fa-check"></i> Modify
                         </button>
                         <% } %>
-                        <a href="/inicio">
-                            <button type="submit" class="btn btn-danger btn-sm" style="margin-top: 10px"><i
-                                        class="fa fa-times"></i> Cancel
-                            </button>
-                        </a>
-                    </div>
-                </div>
-            </div>
         </form>
+        <a href="/Routes">
+            <button type="button" class="btn btn-danger btn-sm" style="margin-top: 10px"><i
+                        class="fa fa-times"></i> Cancel
+            </button>
+        </a>
+</div>
+</div>
+</div>
+
 </div>
 
 <% include ../Partials/footer %>

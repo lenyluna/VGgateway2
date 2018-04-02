@@ -101,8 +101,17 @@ router.get('/changePass', function(req, res, next) {
 });
 
 router.get('/Routes', function(req, res, next) {
+    applyRoute = false;
    checkNloadRoute(res);
 });
+
+router.get('/applyRoutes', function(req, res, next) {
+    applyRoute = false;
+    writeRoutes();
+    command.run('sudo asterisk -rx "core reload"');
+    res.redirect("/Routes");
+});
+
 
 router.post('/saveRoutes', urlencodedParser, function(req, res, next) {
     var getData = req.body;
@@ -129,7 +138,7 @@ router.post('/saveRoutes', urlencodedParser, function(req, res, next) {
     modifyRoute = true;
     applyRoute = true;
     console.log(number + getData.dialPattern + getData.trunkName + getData.redirect);
-    res.render('Routes', {modify:modifyRoute,apply: applyRoute});
+    checkNloadRoute(res);
 });
 
 router.post('/modifyRoutes', urlencodedParser, function(req, res, next) {
@@ -140,7 +149,7 @@ router.post('/modifyRoutes', urlencodedParser, function(req, res, next) {
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
     });
-    modifyRoute = true;
+    modifyRoute = false;
     applyRoute = true;
     console.log(number + getData.dialPattern + getData.trunkName + getData.redirect);
     checkNloadRoute(res);
@@ -273,6 +282,38 @@ function connect(){
     });
 }
 
+function writeRoutes() {
+    var write = "";
+    saveRoute(write);
+    connect().query('select * from routes', function (err, result) {
+        if (err) throw err;
+        Object.keys(result).forEach(function (value) {
+            var row = result[value];
+            write = "[inbound]\n" +
+                "exten => _10XX,1,Log(NOTICE, Incoming call from ${CALLERID(all)})\n" +
+                "exten => _10XX,n,Dial(SIP/user1)\n" +
+                "exten => _10XX,n,Hangup()\n" +
+                "\n" +
+                "[from-trunk]\n" +
+                "exten => _10XX,1,Dial(SIP/TrunkToIssabel/${EXTEN})\n" + //lo que esta de aqui para arriba solo es para prueba
+                "\n" +                                                   //hay que quitarlo a futuro.
+                "exten => "+ row.dialPattern+ ",1,Goto(outbound-dongle,${EXTEN},1)\n" +
+                "\n" +
+                "[outbound-dongle]\n" +
+                "exten => "+ row.dialPattern+ ",1,Log(Notice, outbound call from ${CALLERID(all)})\n" +
+                "exten => "+ row.dialPattern+ ",n,Dial(dongle/dongle0/${EXTEN})\n" +
+                "exten => "+ row.dialPattern+ ",n,Hangup()\n" +
+                "\n" +
+                "\n" +
+                "[from-trunk-dongle]\n" +
+                "exten => _.,1,Log(El numero que usted marco es: ${EXTEN})\n" +
+                "exten => _.,n,Dial(SIP/"+ row.trunkName+ "/"+row.redirect+")\n";
+            saveRoute(write);
+        });
+        connect().end();
+    });
+}
+
 function writeFile(){
      var infoOut ="";
     save(infoOut);
@@ -289,9 +330,19 @@ function writeFile(){
             console.log(infoOut);
            save(infoOut);
         });
+        connect().end();
     });
     mensajeApply=true;
-    connect().end();
+}
+
+function saveRoute(data){
+    fs.writeFile('/etc/asterisk/extensions_custom.conf',data,function(err) {
+        if (err) {
+            throw err;
+        } else {
+            console.log('Guardado Satisfactoriamente');
+        }
+    });
 }
 
 function save(data){
@@ -324,16 +375,18 @@ function checkNloadRoute(res) {
     connect().query('select id from routes', function (err,result) {
         if (err) throw err;
         if (result.length != 0) {
+            modifyRoute = false;
             connect().query('select trunkName,dialPattern,phoneNum,redirect from routes;', function (err,result) {
                 Object.keys(result).forEach(function(key) {
                     var row = result[key];
                     console.log("To la droga: " + row.trunkName +"\n"+ row.dialPattern +"\n"+ row.phoneNum +"\n"+ row.redirect+"\n");
-                    res.render('Routes',{modify:false,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,redirect:row.redirect});
+                    res.render('Routes',{modify:modifyRoute,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,redirect:row.redirect});
                 });
                 connect().end();
             });
         }
         else{
+            modifyRoute = true;
             res.render('Routes',{modify:modifyRoute,apply:applyRoute});
         }
         connect().end();

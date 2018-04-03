@@ -291,11 +291,11 @@ function writeRoutes() {
             var row = result[value];
             write = "[inbound]\n" +
                 "exten => _10XX,1,Log(NOTICE, Incoming call from ${CALLERID(all)})\n" +
-                "exten => _10XX,n,Dial(SIP/user1)\n" +
+                "exten => _10XX,n,Dial(SIP/user2)\n" +
                 "exten => _10XX,n,Hangup()\n" +
                 "\n" +
                 "[from-trunk]\n" +
-                "exten => _10XX,1,Dial(SIP/TrunkToIssabel/${EXTEN})\n" + //lo que esta de aqui para arriba solo es para prueba
+                "exten => _10XX,1,Dial(SIP/"+row.trunkName+"/${EXTEN})\n" + //lo que esta de aqui para arriba solo es para prueba
                 "\n" +                                                   //hay que quitarlo a futuro.
                 "exten => "+ row.dialPattern+ ",1,Goto(outbound-dongle,${EXTEN},1)\n" +
                 "\n" +
@@ -308,7 +308,44 @@ function writeRoutes() {
                 "[from-trunk-dongle]\n" +
                 "exten => _.,1,Log(El numero que usted marco es: ${EXTEN})\n" +
                 "exten => _.,n,Dial(SIP/"+ row.trunkName+ "/"+row.redirect+")\n";
-            saveRoute(write);
+            saveRoute(write,1);
+            write = "[general]\n" +
+                "\n" +
+                "interval=15              \n" +
+                "\n" +
+                "[defaults]\n" +
+                "\n" +
+                "context=from-trunk-dongle\n" +
+                "group=0                  \n" +
+                "rxgain=0                 \n" +
+                "txgain=0                 \n" +
+                "autodeletesms=yes        \n" +
+                "resetdongle=yes          \n" +
+                "u2diag=-1                \n" +
+                "usecallingpres=yes       \n" +
+                "callingpres=allowed_passed_screen\n" +
+                "disablesms=no     \n" +
+                "\n" +
+                "language=en       \n" +
+                "smsaspdu=yes      \n" +
+                "mindtmfgap=45     \n" +
+                "mindtmfduration=80\n" +
+                "mindtmfinterval=20\n" +
+                "\n" +
+                "callwaiting=auto  \n" +
+                "\n" +
+                "disable=no        \n" +
+                "\n" +
+                "initstate=start   \n" +
+                "\n" +
+                "exten=+1"+row.phoneNum+"\n" +
+                "\n" +
+                "dtmf=relax        \n" +
+                "\n" +
+                "[dongle0]\n" +
+                "audio=/dev/ttyUSB1\n" +
+                "data=/dev/ttyUSB2";
+            saveRoute(write,2);
         });
         connect().end();
     });
@@ -335,14 +372,25 @@ function writeFile(){
     mensajeApply=true;
 }
 
-function saveRoute(data){
-    fs.writeFile('/etc/asterisk/extensions_custom.conf',data,function(err) {
-        if (err) {
-            throw err;
-        } else {
-            console.log('Guardado Satisfactoriamente');
-        }
-    });
+function saveRoute(data,num){
+    if(num == 1){
+        fs.writeFile('/etc/asterisk/extensions_custom.conf',data,function(err) {
+            if (err) {
+                throw err;
+            } else {
+                console.log('Guardado Satisfactoriamente');
+            }
+        });
+    }
+    if(num == 2){
+        fs.writeFile('/etc/asterisk/dongle.conf',data,function(err) {
+            if (err) {
+                throw err;
+            } else {
+                console.log('Guardado Satisfactoriamente');
+            }
+        });
+    }
 }
 
 function save(data){

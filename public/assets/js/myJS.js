@@ -23,4 +23,6 @@ function original(){
     document.getElementById('prueba').style.display='none';
     document.getElementById('dNolmal').style.display='block';
     document.getElementById('dadd').style.display='none';
+    document.getElementById('menj').style.display='none';
 }
+

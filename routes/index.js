@@ -157,7 +157,7 @@ router.post('/modifyRoutes', urlencodedParser, function(req, res, next) {
 
 
 router.get('/manageUser', function(req, res, next) {
-    loadListUser (res);
+    loadListUser (res,"","","");
 });
 
 router.get('/device', function(req, res, next) {
@@ -260,6 +260,31 @@ router.post('/device/guardar',function(req, res, next) {
     res.redirect("/device");
 });
 
+router.post('/newUser',function(req, res, next){
+    var username = req.body.username;
+    var password = req.body.pass;
+    var confirm = req.body.confir;
+    var privilegio = req.body.privilegio;
+
+    connect().query("Select * from user where username=?",[username],function(err,result){
+        if(err) throw err;
+        if(result.length != 0){
+            loadListUser (res,"Username already exist",username,privilegio);
+        }else {
+            if(password==confirm){
+                connect().query("INSERT INTO user(username,password,rol) VALUES (?,?,?)",[username,password,privilegio],function (error) {
+                    if(error) throw error;
+                    connect().end();
+                    loadListUser (res,"The Username was created successfully","","");
+                });
+            }else {
+                loadListUser (res,"The password doesn't match",username,privilegio);
+            }
+        }
+        connect().end();
+    });
+
+});
 
 // funciones
 function parsePhoneNum(phoneNum) {
@@ -478,11 +503,13 @@ function InterfaceInfo(res){
     res.render('Device',{ip:ipAddress,net:mask});
 }
 
-function loadListUser (res){
-    connect().query("Select * from user",function(err,result){
+function loadListUser (res,menj,username,privilegio){
+    connect().query("Select username,rol from user",function(err,result){
         if (err) throw err;
-        res.render('manageUsers',{list:result});
+        res.render('manageUsers',{list:result,mensaje:menj,user1:username,privi1:privilegio});
     });
     connect().end();
 }
+
+
 module.exports = router;

@@ -322,6 +322,16 @@ function connect(){
         insecureAuth : true
     });
 }
+function connectToAstDB(){
+    return mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: 'rl2013',
+        database: 'asteriskcdrdb',
+        port: 3306,
+        insecureAuth : true
+    });
+}
 
 function writeRoutes() {
     var write = "";
@@ -453,7 +463,18 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
             var getStatus = cmdParser(data).between('Status', "\n").s;
             var cleanUp = getStatus.split(':');
             var trim = cleanUp[1].trim();
-            res.render('index',{trunkname:row.trunk_name,saddress:myip.address(),daddress:row.host,status:trim,user:req.session.username});
+            connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result2) {
+                if (err) throw err;
+                if (result2.length != 0) {
+                    res.render('index', {
+                        trunkname: row.trunk_name,
+                        saddress: myip.address(),
+                        daddress: row.host,
+                        status: trim,
+                        user: req.session.username,
+                        listCall: result2});
+                }
+            });
         });
     });
 });
@@ -525,6 +546,18 @@ function loadListUser (res,menj,username,privilegio,req){
         res.render('manageUsers',{list:result,mensaje:menj,user1:username,privi1:privilegio,user:req.session.username});
     });
     connect().end();
+}
+
+
+function loadListCall() {
+    connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result) {
+        if (err) throw err;
+        if (result.length != 0) {
+                return result;
+        }
+        connectToAstDB().end();
+    });
+
 }
 
 

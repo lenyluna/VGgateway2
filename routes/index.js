@@ -196,6 +196,14 @@ router.get('/logout',function(req,res,next){
 
 });
 
+
+router.get('/deleteU/',function(req,res,next){
+console.log("Veri"+req.body);
+//    res.redirect('/manageUser');
+
+});
+
+
 router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
     var data = req.body;
     connect().query('UPDATE outgoing  set username=?, trunk_name=?, fromuser=?,secret=?,port=?,host=? where id=1',

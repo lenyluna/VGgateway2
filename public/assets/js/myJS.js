@@ -26,3 +26,12 @@ function original(){
     document.getElementById('menj').style.display='none';
 }
 
+function table(obj){
+    if(obj.checked==true) {
+        document.getElementById('btnDelete').disabled = false;
+        document.getElementById('btnCreate').disabled = true;
+    }else {
+        document.getElementById('btnDelete').disabled = true;
+        document.getElementById('btnCreate').disabled = false;
+    }
+}

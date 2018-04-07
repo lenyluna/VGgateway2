@@ -120,18 +120,19 @@
                   <table id="bootstrap-data-table" class="table table-striped table-bordered">
                     <thead>
                       <tr>
-                          <th>Choose</th>
                         <th>Username</th>
                         <th>Privilige</th>
+                          <th></th>
                       </tr>
                     </thead>
                     <tbody>
 
                     <%for(var i=0; i<list.length;i++){%>
                       <tr >
-                          <td><input type="checkbox" name="Uper"class="switch-input" onclick="javascript:table(this);" ></td>
                         <td><%=list[i].username%></td>
                         <td><%=list[i].rol%></td>
+                          <td><a  href="/deleteU/<%=list[i].id%>"><button type="button" class="btn btn-danger" ><i class="fa fa-trash-o"></i>&nbsp; Delete user</button>
+                                  </a></td>
                       </tr>
                     <%}%>
                     </tbody>

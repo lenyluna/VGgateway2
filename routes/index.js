@@ -197,10 +197,12 @@ router.get('/logout',function(req,res,next){
 });
 
 
-router.get('/deleteU/',function(req,res,next){
-console.log("Veri"+req.body);
-//    res.redirect('/manageUser');
-
+router.get('/deleteU/:id',function(req,res,next){
+    connect().query("delete from user where  id=?",[req.params.id],function(err){
+        if (err) throw err;
+        res.redirect('/manageUser');
+    });
+    connect().end();
 });
 
 
@@ -549,9 +551,9 @@ function InterfaceInfo(res,req){
 }
 
 function loadListUser (res,menj,username,privilegio,req){
-    connect().query("Select username,rol from user",function(err,result){
+    connect().query("Select id,username,rol from user",function(err,result){
         if (err) throw err;
-        res.render('manageUsers',{list:result,mensaje:menj,user1:username,privi1:privilegio,user:req.session.username});
+       res.render('manageUsers',{list:result,mensaje:menj,user1:username,privi1:privilegio,user:req.session.username});
     });
     connect().end();
 }

@@ -45,14 +45,14 @@
             </list>
           </settings>
         </remote-mappings>
-        <remote-mappings server-id="NodeJS@ssh://root@10.0.0.25:22">
+        <remote-mappings server-id="NodeJS@ssh://root@192.168.1.105:22">
           <settings>
             <list>
               <mapping local-root="$PROJECT_DIR$" remote-root="/Proyecto" />
             </list>
           </settings>
         </remote-mappings>
-        <remote-mappings server-id="NodeJS@ssh://root@192.168.1.105:22">
+        <remote-mappings server-id="NodeJS@ssh://root@10.0.0.25:22">
           <settings>
             <list>
               <mapping local-root="$PROJECT_DIR$" remote-root="/Proyecto" />

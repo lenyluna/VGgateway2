@@ -26,6 +26,18 @@ function original(){
     document.getElementById('menj').style.display='none';
 }
 
+function tableMostrar(index) {
+        document.getElementById('titleCheck').style.display = 'block';
+        document.getElementById('btnCreate').disabled = true;
+        for(var i=0;i<index;i++){
+            var valor = "check"+i;
+            document.getElementById(valor).style.display = 'block';
+        }
+        document.getElementById('btnDelete').disabled = true;
+
+        //document.getElementById("bootstrap-data-table").rows[1].cells[0].innerText="<input type='checkbox'/>";
+
+}
 function table(obj){
     if(obj.checked==true) {
         document.getElementById('btnDelete').disabled = false;

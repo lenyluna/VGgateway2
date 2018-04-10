@@ -24,19 +24,28 @@ function original(){
     document.getElementById('dNolmal').style.display='block';
     document.getElementById('dadd').style.display='none';
     document.getElementById('menj').style.display='none';
+
 }
 
+function tableNormal(index){
+    document.getElementById('dele').style.display= 'none';
+    document.getElementById('titleCheck').style.display = 'none';
+    document.getElementById('dNolmal').style.display='block';
+    for(var i=0;i<index;i++){
+        var valor = "check"+i;
+        document.getElementById(valor).style.display = 'none';
+    }
+
+}
 function tableMostrar(index) {
         document.getElementById('titleCheck').style.display = 'block';
-        document.getElementById('btnCreate').disabled = true;
         for(var i=0;i<index;i++){
             var valor = "check"+i;
             document.getElementById(valor).style.display = 'block';
         }
-        document.getElementById('btnDelete').disabled = true;
-
+        document.getElementById('dele').style.display='block';
+        document.getElementById('dNolmal').style.display='none';
         //document.getElementById("bootstrap-data-table").rows[1].cells[0].innerText="<input type='checkbox'/>";
-
 }
 function table(obj){
     if(obj.checked==true) {

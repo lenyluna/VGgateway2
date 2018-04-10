@@ -44,15 +44,23 @@
                               <button type="submit" class="btn btn-success"><i class="fa fa-plus" ></i>&nbsp;Add User</button>
                               <button  type="reset" class="btn btn-danger"  onclick="javascript:original();"><i class="fa fa-times"></i>&nbsp;Cancel</button>
                       </div>
+                      <div id="dele" class="card-newUserheader" style='display:none;'>
+                              <a href="/deleteUser"><button type="button" class="btn btn-success" ><i class="fa fa-plus" ></i>&nbsp;Confirm</button></a>
+                              <button  type="reset" class="btn btn-danger"  onclick="javascript:tableNormal(<%=list.length%>);"><i class="fa fa-times"></i>&nbsp;Cancel</button>
+                      </div>
                       <%}else{%>
                       <div id="dNolmal" class="card-newUserheader">
-                          <button id="btnCreate" type="button" class="btn btn-success" onclick="javascript:mostrar();"><i class="fa fa-magic" ></i>&nbsp; Create User</button>
+                          <button id="btnCreate" type="button" class="btn btn-success" onclick="javascript:mostrar();" href="/deleteUser"><i class="fa fa-magic" ></i>&nbsp; Create User</button>
                           <button id="btnDelete" type="button" class="btn btn-danger" onclick="javascript:tableMostrar(<%=list.length%>);"><i class="fa fa-trash-o"></i>&nbsp; Delete user</button>
                       </div>
                       <div id="dadd" class="card-newUserheader" style='display:none;'>
                           <form action="/newUser" method="post" class="form-horizontal" >
                           <button type="submit" class="btn btn-success"><i class="fa fa-plus" ></i>&nbsp;Add User</button>
                           <button type="reset" class="btn btn-danger"  onclick="javascript:original();"><i class="fa fa-times"></i>&nbsp;Cancel</button>
+                      </div>
+                      <div id="dele" class="card-newUserheader" style='display:none;'>
+                          <a href="/deleteUser"><button type="button" class="btn btn-success"><i class="fa fa-plus" ></i>&nbsp;Confirm</button></a>
+                          <button  type="reset" class="btn btn-danger"  onclick="javascript:tableNormal(<%=list.length%>);"><i class="fa fa-times"></i>&nbsp;Cancel</button>
                       </div>
                       <%}%>
                   </div>
@@ -130,7 +138,7 @@
 
                     <%for(var i=0; i<list.length;i++){%>
                       <tr >
-                          <td id="check<%=i%>" style='display:none;' align="center" ><input type="checkbox" onclick="javascript:table(this);"></td>
+                          <td id="check<%=i%>" style='display:none;' align="center"><input name="ch<%=i%>" type="checkbox" onclick="javascript:table(this);"></td>
                         <td><%=list[i].username%></td>
                         <td><%=list[i].rol%></td>
                           <td><a  href="/deleteU/<%=list[i].id%>"><button type="button" class="btn btn-danger" ><i class="fa fa-trash-o"></i>&nbsp; Delete user</button>

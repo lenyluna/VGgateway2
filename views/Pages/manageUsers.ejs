@@ -30,7 +30,7 @@
 </div>
 <%}%>
         <div class="content mt-3">
-            <div class="animated fadeIn">
+            <iv  class="animated fadeIn">
               <div class="row">
                 <div class="col-md-12">
                   <div class="card">
@@ -45,7 +45,7 @@
                               <button  type="reset" class="btn btn-danger"  onclick="javascript:original();"><i class="fa fa-times"></i>&nbsp;Cancel</button>
                       </div>
                       <div id="dele" class="card-newUserheader" style='display:none;'>
-                              <a href="/deleteUser"><button type="button" class="btn btn-success" ><i class="fa fa-plus" ></i>&nbsp;Confirm</button></a>
+                             <button type="button" class="btn btn-success"  onclick="javascript:eliminar(<%=list.length%>);" ><i class="fa fa-plus" ></i>&nbsp;Confirm</button>
                               <button  type="reset" class="btn btn-danger"  onclick="javascript:tableNormal(<%=list.length%>);"><i class="fa fa-times"></i>&nbsp;Cancel</button>
                       </div>
                       <%}else{%>
@@ -59,7 +59,7 @@
                           <button type="reset" class="btn btn-danger"  onclick="javascript:original();"><i class="fa fa-times"></i>&nbsp;Cancel</button>
                       </div>
                       <div id="dele" class="card-newUserheader" style='display:none;'>
-                          <a href="/deleteUser"><button type="button" class="btn btn-success"><i class="fa fa-plus" ></i>&nbsp;Confirm</button></a>
+                          <button type="button" class="btn btn-success" onclick="javascript:eliminar(<%=list.length%>);"><i class="fa fa-plus" ></i>&nbsp;Confirm</button>
                           <button  type="reset" class="btn btn-danger"  onclick="javascript:tableNormal(<%=list.length%>);"><i class="fa fa-times"></i>&nbsp;Cancel</button>
                       </div>
                       <%}%>
@@ -138,8 +138,8 @@
 
                     <%for(var i=0; i<list.length;i++){%>
                       <tr >
-                          <td id="check<%=i%>" style='display:none;' align="center"><input name="ch<%=i%>" type="checkbox" onclick="javascript:table(this);"></td>
-                        <td><%=list[i].username%></td>
+                          <td id="check<%=i%>" style='display:none;' align="center"><input id="ch<%=i%>" name="<%=list[i].id%>"  type="checkbox" onclick="javascript:table(this);"></td>
+                          <td><%=list[i].username%></td>
                         <td><%=list[i].rol%></td>
                           <td><a  href="/deleteU/<%=list[i].id%>"><button type="button" class="btn btn-danger" ><i class="fa fa-trash-o"></i>&nbsp; Delete user</button>
                                   </a></td>
@@ -159,7 +159,7 @@
 
     <!-- Right Panel -->
 <% include ../Partials/footer %>
-<script>
+<!--<script>
     jQuery(document).ready(function() {
         jQuery(".standardSelect").chosen({
             disable_search_threshold: 10,
@@ -167,7 +167,7 @@
             width: "100%"
         });
     });
-</script>
+</script>-->
 </body>
 <script src="assets/js/myJS.js" type="text/javascript"> </script>
 </html>

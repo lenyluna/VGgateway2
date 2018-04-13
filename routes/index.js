@@ -197,25 +197,12 @@ router.get('/logout',function(req,res,next){
 });
 
 
-router.get('/deleteUser',urlencodedParser,function(req,res,next){
-    console.log("prueba"+req.body.ch0);
-   /* connect().query("Select id,username,rol from user",function(err,result){
+router.get('/deleteUser/:id',urlencodedParser,function(req,res,next){
+    var id= req.params.id;
+    console.log("prueba"+id);
+    connect().query("delete from user where id=?",[id],function(err){
         if (err) throw err;
-        for(var i=0;i<result.length;i++){
-            var valor = "check"+i;
-            console.log("prueba"+req.param(valor));
-            if(req.param(valor)=='on'){
-                connect().query("delete from user where  id=?",[result[i].id],function(err){
-                    if (err) throw err;
-                    res.redirect('/manageUser');
-                    connect().end();
-                });
-
-            }
-        }
-        connect().end();
-    });*/
-
+    });
 
 });
 

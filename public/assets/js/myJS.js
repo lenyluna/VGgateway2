@@ -45,7 +45,6 @@ function tableMostrar(index) {
         }
         document.getElementById('dele').style.display='block';
         document.getElementById('dNolmal').style.display='none';
-        //document.getElementById("bootstrap-data-table").rows[1].cells[0].innerText="<input type='checkbox'/>";
 }
 function table(obj){
     if(obj.checked==true) {
@@ -54,5 +53,19 @@ function table(obj){
     }else {
         document.getElementById('btnDelete').disabled = true;
         document.getElementById('btnCreate').disabled = false;
+    }
+
+}
+
+
+
+function eliminar(index){
+    for(var i=0;i<index;i++){
+        var valor = "ch"+i;
+        if(document.getElementById(valor).checked == true){
+             $.get("/deleteUser/"+document.getElementById(valor).getAttribute('name'));
+        }
+       // document.getElementById("bootstrap-data-table").deleteRow(i+1);
+        document.getElementById(valor).checked = false;
     }
 }

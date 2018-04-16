@@ -11,6 +11,15 @@
 </div>
 <% } %>
 
+<%if(mensaje==true){%>
+<div class="col-sm-12">
+    <div class="sufee-alert alert with-close alert-danger alert-dismissible fade show" role="alert" align="center">
+        <a href="/ConfiguracionTrunk"> Please create a Trunk before making a Call Route. To go to Trunk configuration click here. </a>
+    </div>
+</div>
+<%}%>
+
+
 <div class="breadcrumbs">
     <div class="col-sm-4">
         <div class="page-header float-left">
@@ -98,12 +107,11 @@
                     <strong>Route from Phone</strong>
                 </div>
                 <div class="card-body card-block">
-
                     <div class="row form-group">
                         <div class="col col-md-3"><label for="text-input" class=" form-control-label">Trunk Name</label>
                         </div>
                         <div class="col-12 col-md-9"><input type="text" id="text-input" name="trunkName"
-                                                            placeholder="TrunkToVGG" class="form-control">
+                                                            placeholder="TrunkToVGG" class="form-control" value="<%=trunkName2%>" disabled>
                         </div>
                     </div>
                     <div class="row form-group">
@@ -208,7 +216,7 @@
                             </div>
                             <div class="col-12 col-md-9"><input type="text" id="text-input" name="trunkName"
                                                                 placeholder="TrunkToVGG" class="form-control"
-                                                                value="<%= trunkName %>">
+                                                                value="<%= trunkName %>" disabled>
                             </div>
                         </div>
                         <div class="row form-group">
@@ -229,9 +237,15 @@
                 <div class="col-sm-12">
                     <div class="page-header float-right">
                         <% if(modify){ %>
-                        <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 10px"><i
-                                    class="fa fa-check"></i> Submit
-                        </button>
+                            <% if (mensaje==true){%>
+                            <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 10px" disabled><i
+                                        class="fa fa-check"></i> Submit
+                            </button>
+                            <%}else {%>
+                            <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 10px"><i
+                                        class="fa fa-check"></i> Submit
+                            </button>
+                            <%}%>
                         <% } else { %>
                         <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 10px"><i
                                     class="fa fa-check"></i> Modify

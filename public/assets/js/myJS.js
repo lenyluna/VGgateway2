@@ -48,24 +48,18 @@ function tableMostrar(index) {
 }
 function table(obj){
     if(obj.checked==true) {
-        document.getElementById('btnDelete').disabled = false;
-        document.getElementById('btnCreate').disabled = true;
+        document.getElementById('btnconfirm').disabled = false;
     }else {
-        document.getElementById('btnDelete').disabled = true;
-        document.getElementById('btnCreate').disabled = false;
+        document.getElementById('btnconfirm').disabled = true;
     }
-
 }
-
-
 
 function eliminar(index){
     for(var i=0;i<index;i++){
         var valor = "ch"+i;
         if(document.getElementById(valor).checked == true){
              $.get("/deleteUser/"+document.getElementById(valor).getAttribute('name'));
+            document.getElementById("bootstrap-data-table").deleteRow(i+1);
         }
-       // document.getElementById("bootstrap-data-table").deleteRow(i+1);
-        document.getElementById(valor).checked = false;
     }
 }

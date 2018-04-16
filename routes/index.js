@@ -4,7 +4,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var cleave = require('cleave.js');
 /* GET home page. */
-
+var power = false; //verificar si es administrador o no
 var fs = require('fs');
 var path = require('path');
 var command = require('node-cmd');
@@ -93,6 +93,11 @@ router.post('/login', function(req, res, next) {
                     }
                     req.session.userid =result[0].id ;
                     req.session.username = result[0].username;
+                    if(result[0].rol == "Admin"){
+                        power=true;
+                    }else {
+                        power=false;
+                    }
                     res.redirect('/dashboard');
                 } else {
                     console.log("Informaciones incorrectas");
@@ -107,9 +112,32 @@ router.get('/inicio', function(req, res, next) {
 });
 
 router.get('/changePass', function(req, res, next) {
-    res.render('ChangePassword',{user:req.session.username});
+    res.render('ChangePassword',{user:req.session.username,menj:"",power:power});
 });
 
+router.post('/SavePass', function(req, res, next) {
+    var oldPass = req.body.oldP;
+    var newPass = req.body.newP;
+    var confirmPass = req.body.conP;
+    var id = req.session.userid;
+    if(newPass==confirmPass){
+        connect().query("select * from user where password=? and  id=?",[oldPass,id],function (error,result) {
+            if(error) throw error;
+            if(result.length!=0 ){
+                connect().query('UPDATE user set password=? where id=?',
+                    [newPass,id],function (err) {
+                        if (err) throw err;
+                        res.render('ChangePassword',{user:req.session.username,menj:"The changes was successful"});
+                    });
+            }else {
+                res.render('ChangePassword',{user:req.session.username,menj:"The old password is incorrect"});
+            }
+        });
+    }else {
+        res.render('ChangePassword',{user:req.session.username,menj:"The new password doesn't match"});
+    }
+    connect().end();
+});
 router.get('/Routes', function(req, res, next) {
     applyRoute = false;
    checkNloadRoute(res,req);
@@ -199,11 +227,10 @@ router.get('/logout',function(req,res,next){
 
 router.get('/deleteUser/:id',urlencodedParser,function(req,res,next){
     var id= req.params.id;
-    console.log("prueba"+id);
     connect().query("delete from user where id=?",[id],function(err){
         if (err) throw err;
     });
-
+    connect().end();
 });
 
 
@@ -483,7 +510,8 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
                         daddress: row.host,
                         status: trim,
                         user: req.session.username,
-                        listCall: result2});
+                        listCall: result2,
+                        power:power});
                 }
             });
         });
@@ -501,14 +529,27 @@ function checkNloadRoute(res,req) {
                 Object.keys(result).forEach(function(key) {
                     var row = result[key];
                     console.log("To la droga: " + row.trunkName +"\n"+ row.dialPattern +"\n"+ row.phoneNum +"\n"+ row.redirect+"\n");
-                    res.render('Routes',{modify:modifyRoute,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,redirect:row.redirect,user:req.session.username});
+                    res.render('Routes',{modify:modifyRoute,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,redirect:row.redirect,user:req.session.username,mensaje:false,power:power});
                 });
                 connect().end();
             });
         }
         else{
             modifyRoute = true;
-            res.render('Routes',{modify:modifyRoute,apply:applyRoute});
+            connect().query("select trunk_name from outgoing",function(err,result){
+                if (err) throw err;
+                if(result.length()!=0) {
+                    Object.keys(result).forEach(function (key) {
+                        var row = result[key];
+                        res.render('Routes',{modify:modifyRoute,apply:applyRoute,trunkName2:row.trunk_name,mensaje:false,power:power});
+                    });
+                }else {
+                    res.render('Routes',{modify:modifyRoute,apply:applyRoute,trunkName2:"",mensaje:true,power:power});
+                }
+                connect().end();
+            });
+
+
         }
         connect().end();
     });
@@ -528,10 +569,10 @@ function veriTrunk(res,req){
                         var row = result[key];
                         if(mensajeApply==true){
                         res.render('Trunk-Configuration',{apply:true,modify:true,trunknameS:row.trunk_name,hostS:row.host,usernameS:row.username,secretS:row.secret,
-                            fromuserS:row.fromuser,portS:row.port,userInS:row.userIn,secretInS:row.secretIn,user:req.session.username});
+                            fromuserS:row.fromuser,portS:row.port,userInS:row.userIn,secretInS:row.secretIn,user:req.session.username,power:power});
                         }else {
                             res.render('Trunk-Configuration',{apply:false,modify:true,trunknameS:row.trunk_name,hostS:row.host,usernameS:row.username,secretS:row.secret,
-                                fromuserS:row.fromuser,portS:row.port,userInS:row.userIn,secretInS:row.secretIn,user:req.session.username});
+                                fromuserS:row.fromuser,portS:row.port,userInS:row.userIn,secretInS:row.secretIn,user:req.session.username,power:power});
                         }
                     });
                 });
@@ -548,18 +589,16 @@ function InterfaceInfo(res,req){
     var ipAddress = eth0[0].address;
     var mask  = eth0[0].netmask;
    // var gateway //falta gateway
-    res.render('Device',{ip:ipAddress,net:mask,user:req.session.username});
+    res.render('Device',{ip:ipAddress,net:mask,user:req.session.username,power:power});
 }
 
 function loadListUser (res,menj,username,privilegio,req){
     connect().query("Select id,username,rol from user",function(err,result){
         if (err) throw err;
-       res.render('manageUsers',{list:result,mensaje:menj,user1:username,privi1:privilegio,user:req.session.username});
+       res.render('manageUsers',{list:result,mensaje:menj,user1:username,privi1:privilegio,user:req.session.username,power:power});
     });
     connect().end();
 }
-
-
 function loadListCall() {
     connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result) {
         if (err) throw err;
@@ -570,6 +609,7 @@ function loadListCall() {
     });
 
 }
+
 
 
 module.exports = router;

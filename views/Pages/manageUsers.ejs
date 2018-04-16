@@ -50,7 +50,7 @@
                       </div>
                       <%}else{%>
                       <div id="dNolmal" class="card-newUserheader">
-                          <button id="btnCreate" type="button" class="btn btn-success" onclick="javascript:mostrar();" href="/deleteUser"><i class="fa fa-magic" ></i>&nbsp; Create User</button>
+                          <button id="btnCreate" type="button" class="btn btn-success" onclick="javascript:mostrar();" ><i class="fa fa-magic" ></i>&nbsp; Create User</button>
                           <button id="btnDelete" type="button" class="btn btn-danger" onclick="javascript:tableMostrar(<%=list.length%>);"><i class="fa fa-trash-o"></i>&nbsp; Delete user</button>
                       </div>
                       <div id="dadd" class="card-newUserheader" style='display:none;'>
@@ -59,7 +59,7 @@
                           <button type="reset" class="btn btn-danger"  onclick="javascript:original();"><i class="fa fa-times"></i>&nbsp;Cancel</button>
                       </div>
                       <div id="dele" class="card-newUserheader" style='display:none;'>
-                          <button type="button" class="btn btn-success" onclick="javascript:eliminar(<%=list.length%>);"><i class="fa fa-plus" ></i>&nbsp;Confirm</button>
+                          <button id="btnconfirm" type="button" class="btn btn-success" onclick="javascript:eliminar(<%=list.length%>);" disabled><i class="fa fa-plus" ></i>&nbsp;Confirm</button>
                           <button  type="reset" class="btn btn-danger"  onclick="javascript:tableNormal(<%=list.length%>);"><i class="fa fa-times"></i>&nbsp;Cancel</button>
                       </div>
                       <%}%>
@@ -75,14 +75,14 @@
                                     <div class="col col-md-1"><label for="text-input" class=" form-control-label">Username</label></div>
                                     <div class=" col-md-2"><input type="text" name="username" class="form-control" style="height: 25px" /></div>
                                     <div class="col col-md-1"><label for="text-input" class=" form-control-label">Password</label></div>
-                                    <div class="col-md-2 " ><input type="text" name="pass" class="form-control" style="height: 25px"/></div>
+                                    <div class="col-md-2 " ><input type="password" name="pass" class="form-control" style="height: 25px"/></div>
                                     <div class="col col-md-1"><label for="text-input" class=" form-control-label">Confirm </label></div>
                                     <div class="col-md-2 " ><input type="text" name="confir" class="form-control" style="height: 25px"/></div>
                                     <div class="col col-md-1"><label for="text-input" class=" form-control-label">Privilege</label></div>
                                     <div class="col-md-2">
                                         <select data-placeholder="Choose a Country..." class="standardSelect" tabindex="2"  name="privilegio" >
-                                            <option value="Administrador">Administrador</option>
-                                            <option value="Reportes">Solo lectura</option>
+                                            <option value="Read only">Read Only</option>
+                                            <option value="Admin">Admin</option>
                                         </select>
                                     </div>
                                     </form>
@@ -100,14 +100,14 @@
                                         <div class="col col-md-1"><label for="text-input" class=" form-control-label">Username</label></div>
                                         <div class=" col-md-2"><input type="text" name="username" class="form-control" style="height: 25px"/></div>
                                         <div class="col col-md-1"><label for="text-input" class=" form-control-label">Password</label></div>
-                                        <div class="col-md-2 " ><input type="text" name="pass" class="form-control" style="height: 25px"/></div>
+                                        <div class="col-md-2 " ><input type="password" name="pass" class="form-control" style="height: 25px"/></div>
                                         <div class="col col-md-1"><label for="text-input" class=" form-control-label">Confirm </label></div>
-                                        <div class="col-md-2 " ><input type="text" name="confir" class="form-control" style="height: 25px"/></div>
+                                        <div class="col-md-2 " ><input type="password" name="confir" class="form-control" style="height: 25px"/></div>
                                         <div class="col col-md-1"><label for="text-input" class=" form-control-label">Privilege</label></div>
                                         <div class="col-md-2">
                                             <select data-placeholder="Choose a Country..." class="standardSelect" tabindex="2" name="privilegio">
-                                                <option value="Administrador">Administrador</option>
-                                                <option value="Reportes">Solo lectura</option>
+                                                <option value="Read only">Read only</option>
+                                                <option value="admin">Admin</option>
                                             </select>
                                         </div>
                                     </form>
@@ -131,7 +131,6 @@
                         <th id="titleCheck" style='display:none;'>Choose</th>
                         <th>Username</th>
                         <th>Privilige</th>
-                          <th></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -141,8 +140,6 @@
                           <td id="check<%=i%>" style='display:none;' align="center"><input id="ch<%=i%>" name="<%=list[i].id%>"  type="checkbox" onclick="javascript:table(this);"></td>
                           <td><%=list[i].username%></td>
                         <td><%=list[i].rol%></td>
-                          <td><a  href="/deleteU/<%=list[i].id%>"><button type="button" class="btn btn-danger" ><i class="fa fa-trash-o"></i>&nbsp; Delete user</button>
-                                  </a></td>
                       </tr>
                     <%}%>
                     </tbody>

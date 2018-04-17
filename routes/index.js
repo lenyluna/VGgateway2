@@ -72,7 +72,15 @@ function bufferFile(myPath){
 // comment
 router.get('/dashboard',function (req,res,next) {
     console.log("Cookies :  ", req.cookies);
-    trunkInf(res,req);
+    res.render('index', {
+        trunkname: "",
+        saddress: myip.address(),
+        daddress: "",
+        status: "",
+        user: req.session.username,
+        listCall: "",
+        power:power});
+    //trunkInf(res,req);
 })
 router.get('/', function(req, res, next) {
     var date = new Date();
@@ -213,6 +221,7 @@ router.get('/ConfiguracionTrunk', function(req, res, next) {
 });
 
 router.get('/ConfiguracionTrunk/applyConf', function(req, res, next) {
+    writeFile();
     command.run('sudo asterisk -rx "core reload"');
     mensajeApply = false;
     res.redirect("/ConfiguracionTrunk");
@@ -247,8 +256,7 @@ router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
     });
-    writeFile();
-
+    mensajeApply = true;
     res.redirect("/ConfiguracionTrunk");
 });
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
@@ -538,13 +546,13 @@ function checkNloadRoute(res,req) {
             modifyRoute = true;
             connect().query("select trunk_name from outgoing",function(err,result){
                 if (err) throw err;
-                if(result.length()!=0) {
+                if(result.length!=0) {
                     Object.keys(result).forEach(function (key) {
                         var row = result[key];
-                        res.render('Routes',{modify:modifyRoute,apply:applyRoute,trunkName2:row.trunk_name,mensaje:false,power:power});
+                        res.render('Routes',{modify:modifyRoute,apply:applyRoute,trunkName2:row.trunk_name,mensaje:false,power:power,user:req.session.username});
                     });
                 }else {
-                    res.render('Routes',{modify:modifyRoute,apply:applyRoute,trunkName2:"",mensaje:true,power:power});
+                    res.render('Routes',{modify:modifyRoute,apply:applyRoute,trunkName2:"",mensaje:true,power:power,user:req.session.username});
                 }
                 connect().end();
             });
@@ -560,7 +568,7 @@ function veriTrunk(res,req){
             throw err;
         } else {
             if(result.length==0){
-                res.render('Trunk-Configuration',{apply:false,modify:false});
+                res.render('Trunk-Configuration',{apply:false,modify:false,power:power,user:req.session.username});
             }else{
                 connect().query("Select o.username,o.trunk_name,o.fromuser,o.secret,o.port,o.type,o.host,i.username as userIn,i.secret as secretIn,i.context as contextIn,i.type as typeIn " +
                     "from trunk t inner join outgoing o on t.id_outgoing =o.id inner join incoming  i on i.id = t.id_incoming", function(err,result,fields) {

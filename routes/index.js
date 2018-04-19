@@ -25,7 +25,6 @@ var myFile;
 var j = 0;
 
 
-
 /*function encriptar(info){
     var saltRounds = 10;
     encrypt.hash(info,saltRounds,function(err,hash){
@@ -69,19 +68,18 @@ function bufferFile(myPath){
     });
 }
 
+function isAuthe(req,res,next){
+    if(req.session.username!=null){
+        return next();
+    }else {
+        res.redirect('/');
+    }
+}
 // comment
-router.get('/dashboard',function (req,res,next) {
-    console.log("Cookies :  ", req.cookies);
-    res.render('index', {
-        trunkname: "",
-        saddress: myip.address(),
-        daddress: "",
-        status: "",
-        user: req.session.username,
-        listCall: "",
-        power:power});
-    //trunkInf(res,req);
-})
+router.get('/dashboard',isAuthe,function (req,res,next) {
+    trunkInf(res,req);
+});
+
 router.get('/', function(req, res, next) {
     var date = new Date();
     res.render('login',{veri:false});
@@ -96,8 +94,6 @@ router.post('/login', function(req, res, next) {
                 if (result.length==1) {
                     console.log("Login satisfactorio");
                     if(save=='on'){
-                        console.log("prueba");
-                        res.cookie("id_User",result[0].id,{expire : new Date() + 9999}).sendDate;
                     }
                     req.session.userid =result[0].id ;
                     req.session.username = result[0].username;
@@ -115,11 +111,11 @@ router.post('/login', function(req, res, next) {
     });
 });
 
-router.get('/inicio', function(req, res, next) {
+router.get('/inicio',isAuthe, function(req, res, next) {
     res.render('Device');
 });
 
-router.get('/changePass', function(req, res, next) {
+router.get('/changePass',isAuthe, function(req, res, next) {
     res.render('ChangePassword',{user:req.session.username,menj:"",power:power});
 });
 
@@ -146,12 +142,12 @@ router.post('/SavePass', function(req, res, next) {
     }
     connect().end();
 });
-router.get('/Routes', function(req, res, next) {
+router.get('/Routes',isAuthe, function(req, res, next) {
     applyRoute = false;
    checkNloadRoute(res,req);
 });
 
-router.get('/applyRoutes', function(req, res, next) {
+router.get('/applyRoutes',isAuthe, function(req, res, next) {
     applyRoute = false;
     writeRoutes();
     command.run('sudo asterisk -rx "core reload"');
@@ -202,39 +198,39 @@ router.post('/modifyRoutes', urlencodedParser, function(req, res, next) {
 });
 
 
-router.get('/manageUser', function(req, res, next) {
+router.get('/manageUser',isAuthe, function(req, res, next) {
     loadListUser (res,"","","",req);
 });
 
-router.get('/device', function(req, res, next) {
+router.get('/device', isAuthe,function(req, res, next) {
     InterfaceInfo(res,req);
 
 });
 
-router.get('/Trunks', function(req, res, next) {
+router.get('/Trunks',isAuthe, function(req, res, next) {
     trunkInf(res,req);
     //res.render('Trunk-List',{trunkname:"prueba",saddress:"192.168.1.0",daddress:"10.0.0.20",status:"Ni idea"});
 });
 
-router.get('/ConfiguracionTrunk', function(req, res, next) {
+router.get('/ConfiguracionTrunk',isAuthe, function(req, res, next) {
     veriTrunk(res,req);
 });
 
-router.get('/ConfiguracionTrunk/applyConf', function(req, res, next) {
+router.get('/ConfiguracionTrunk/applyConf',isAuthe, function(req, res, next) {
     writeFile();
     command.run('sudo asterisk -rx "core reload"');
     mensajeApply = false;
     res.redirect("/ConfiguracionTrunk");
 });
 
-router.get('/logout',function(req,res,next){
+router.get('/logout',isAuthe,function(req,res,next){
    req.session.destroy();
    res.redirect('/');
 
 });
 
 
-router.get('/deleteUser/:id',urlencodedParser,function(req,res,next){
+router.get('/deleteUser/:id',urlencodedParser,isAuthe,function(req,res,next){
     var id= req.params.id;
     connect().query("delete from user where id=?",[id],function(err){
         if (err) throw err;

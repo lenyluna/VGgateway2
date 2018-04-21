@@ -24,45 +24,12 @@ var buffer = bufferFile('/etc/asterisk/sip_custom.conf');
 var myFile;
 var j = 0;
 
-
-/*function encriptar(info){
-    var saltRounds = 10;
-    encrypt.hash(info,saltRounds,function(err,hash){
-        if(err) throw err;
-        return hash;
-    });
-}*/
-
-function formatString(data){
-    var cant = data.match("\n").length;
-    var arr = data;
-    for(var i = 0; i < cant; i++){
-        switch (j){
-            case 0:
-                arr = data.toString().replace("\n",",");
-                j++;
-                break;
-            case 1:
-                data = arr.toString().replace("\n",",");
-                j++;
-                break;
-            case 2:
-                arr = data.toString().replace("\n",",");
-                j--;
-                break;
-        }
-    }
-    data = arr.split(",");
-    return data;
-}
-
-
 function bufferFile(myPath){
     return fs.readFile(myPath, 'utf-8', function(err, data){
         if(err){
             console.log(err);
         } else{
-            myFile = data
+            myFile = data;
             console.log (myFile);
         }
     });
@@ -499,27 +466,48 @@ function save(data){
 function trunkInf(res,req){
 connect().query("Select trunk_name,host from outgoing", function(err,result){
     if  (err) throw err;
-    Object.keys(result).forEach(function(key) {
-        var row = result[key];
-        command.get('asterisk -rx "sip show peer '+row.trunk_name+'"',function(err, data, stderr) {
-            var getStatus = cmdParser(data).between('Status', "\n").s;
-            var cleanUp = getStatus.split(':');
-            var trim = cleanUp[1].trim();
-            connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result2) {
-                if (err) throw err;
-                if (result2.length != 0) {
-                    res.render('index', {
-                        trunkname: row.trunk_name,
-                        saddress: myip.address(),
-                        daddress: row.host,
-                        status: trim,
-                        user: req.session.username,
-                        listCall: result2,
-                        power:power});
-                }
+    console.log("fokiu " + result.length);
+    if(result.length != 0){
+        Object.keys(result).forEach(function(key) {
+            var row = result[key];
+            command.get('asterisk -rx "sip show peer '+row.trunk_name+'"',function(err, data, stderr) {
+                var getStatus = cmdParser(data).between('Status', "\n").s;
+                var cleanUp = getStatus.split(':');
+                var trim = cleanUp[1].trim();
+                connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result2) {
+                    if (err) throw err;
+                    if (result2.length != 0) {
+                        console.log("trunk name: " + row.trunk_name + "\n host: " + row.host + "\n ip address: " + myip.address() + "\nlog length: " + result2.length);
+                        res.render('index', {
+                            trunkname: row.trunk_name,
+                            saddress: myip.address(),
+                            daddress: row.host,
+                            status: trim,
+                            user: req.session.username,
+                            listCall: result2,
+                            power:power});
+                    }
+                });
             });
         });
-    });
+    }
+    else{
+        connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result2) {
+            if (err) throw err;
+            if (result2.length != 0) {
+                //console.log("trunk name: " + row.trunk_name + "\n host: " + row.host + "\n ip address: " + myip.address() + "\nlog length: " + result2.length);
+                res.render('index', {
+                    trunkname: null,
+                    saddress: null,
+                    daddress: null,
+                    status: null,
+                    user: req.session.username,
+                    listCall: result2,
+                    power:power
+                });
+            }
+        });
+    }
 });
 connect().end();
 }
@@ -589,7 +577,7 @@ function veriTrunk(res,req){
 }
 
 function InterfaceInfo(res,req){
-    var eth0 = os.getNetworkInterfaces().eth0;
+    var eth0 = os.getNetworkInterfaces().wlan0;
     var ipAddress = eth0[0].address;
     var mask  = eth0[0].netmask;
    // var gateway //falta gateway

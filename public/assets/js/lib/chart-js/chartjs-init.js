@@ -17,8 +17,8 @@
                     borderColor: "rgba(0, 123, 255, 0.9)",
                     borderWidth: "0",
                     backgroundColor: "rgba(0, 123, 255, 0.5)"
-                            }
-                        ]
+                }
+            ]
         },
         options: {
             scales: {
@@ -26,11 +26,10 @@
                     ticks: {
                         beginAtZero: true
                     }
-                                } ]
+                } ]
             }
         }
     } );
-
 
 
 

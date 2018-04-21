@@ -12,8 +12,6 @@
         lengthMenu: [[10, 20, 50, -1], [10, 20, 50, "All"]],
     });
 
-
-
     $('#bootstrap-data-table-export').DataTable({
         dom: 'lBfrtip',
         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -21,7 +19,16 @@
             'copy', 'csv', 'excel', 'pdf', 'print'
         ]
     });
-	
+
+    $('#tableInfo').DataTable({
+        //lengthMenu: [[10, 20, 50, -1], [10, 20, 50, "All"]],
+		bPaginate: false,
+		bSort: false,
+		bFilter: false,
+		bInfo: false
+
+    });
+
 	$('#row-select').DataTable( {
 			initComplete: function () {
 				this.api().columns().every( function () {

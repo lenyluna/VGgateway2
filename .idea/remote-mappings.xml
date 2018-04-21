@@ -10,13 +10,6 @@
             </list>
           </settings>
         </remote-mappings>
-        <remote-mappings server-id="NodeJS@ssh://root@192.168.1.23:22">
-          <settings>
-            <list>
-              <mapping local-root="$PROJECT_DIR$" remote-root="/ProyectoFinal" />
-            </list>
-          </settings>
-        </remote-mappings>
         <remote-mappings server-id="NodeJS@ssh://root@192.168.1.102:22">
           <settings>
             <list>
@@ -38,13 +31,6 @@
             </list>
           </settings>
         </remote-mappings>
-        <remote-mappings server-id="NodeJS@ssh://root@192.168.2.5:22">
-          <settings>
-            <list>
-              <mapping local-root="$PROJECT_DIR$" remote-root="/Proyecto" />
-            </list>
-          </settings>
-        </remote-mappings>
         <remote-mappings server-id="NodeJS@ssh://root@192.168.1.105:22">
           <settings>
             <list>
@@ -56,6 +42,20 @@
           <settings>
             <list>
               <mapping local-root="$PROJECT_DIR$" remote-root="/Proyecto" />
+            </list>
+          </settings>
+        </remote-mappings>
+        <remote-mappings server-id="NodeJS@ssh://root@192.168.1.23:22">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$" remote-root="/proyectoVG" />
+            </list>
+          </settings>
+        </remote-mappings>
+        <remote-mappings server-id="NodeJS@ssh://root@192.168.2.5:22">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$" remote-root="/proyectoVG" />
             </list>
           </settings>
         </remote-mappings>

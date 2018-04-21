@@ -3,10 +3,8 @@ var router = express.Router();
 var app = express();
 var bodyParser = require('body-parser');
 var cleave = require('cleave.js');
-/* GET home page. */
 var power = false; //verificar si es administrador o no
 var fs = require('fs');
-var path = require('path');
 var command = require('node-cmd');
 var mensajeApply = false;
 var applyRoute = false;
@@ -172,11 +170,6 @@ router.get('/manageUser',isAuthe, function(req, res, next) {
 router.get('/device', isAuthe,function(req, res, next) {
     InterfaceInfo(res,req);
 
-});
-
-router.get('/Trunks',isAuthe, function(req, res, next) {
-    trunkInf(res,req);
-    //res.render('Trunk-List',{trunkname:"prueba",saddress:"192.168.1.0",daddress:"10.0.0.20",status:"Ni idea"});
 });
 
 router.get('/ConfiguracionTrunk',isAuthe, function(req, res, next) {

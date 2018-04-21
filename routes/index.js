@@ -589,7 +589,7 @@ function veriTrunk(res,req){
 }
 
 function InterfaceInfo(res,req){
-    var eth0 = os.getNetworkInterfaces().wlan0;
+    var eth0 = os.getNetworkInterfaces().eth0;
     var ipAddress = eth0[0].address;
     var mask  = eth0[0].netmask;
    // var gateway //falta gateway

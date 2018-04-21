@@ -6,12 +6,9 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "bcrypt": "^1.0.3",
     "body-parser": "~1.18.2",
     "browser-cookies": "^1.2.0",
     "cleave.js": "^1.2.1",
-    "cookie": "file:node_modules/cookie",
-    "cookie-parser": "file:node_modules/cookie-parser",
     "debug": "~2.6.9",
     "ejs": "^2.5.8",
     "express": "~4.15.5",

@@ -213,39 +213,32 @@ router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
 });
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
+    var done = 0;
     connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
         if (err) throw err;
+        done++;
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
     });
 
     connect().query('INSERT INTO incoming VALUES (?,?,?,?,?)',[1,data.usernameI,data.passwordI,'from-trunk','peer'],function (err, result) {
         if (err) throw err;
+        done++;
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
     });
-
-    connect().query("INSERT INTO trunk VALUES (1,1,1)",function (error) {
-        if(error) throw error;
-        connect().end();
-    });
-
-    connect().query("select id from routes",function (error, result) {
-        if(error) throw error;
-        if(result.length != 0){
-            connect().query("INSERT INTO trunkRoute VALUES (1,1,1)",function (error) {
-                if(error) throw error;
-            });
-        }
-        else{
-            console.log("No se ha creado la Ruta !!");
-        }
-        connect().end();
-    });
-
+    saveTrunk();
     mensajeApply = true;
     res.redirect("/ConfiguracionTrunk");
 });
+
+function saveTrunk(){
+    connect().query("INSERT INTO trunk VALUES (1,1,1)",function (error) {
+        if(error) throw error;
+        done = 0;
+        connect().end();
+    });
+}
 
 router.post('/device/guardar',function(req, res, next) {
     var data = req.body;

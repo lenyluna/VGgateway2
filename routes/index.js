@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var app = express();
 var bodyParser = require('body-parser');
-var cleave = require('cleave.js');
 var power = false; //verificar si es administrador o no
 var fs = require('fs');
 var command = require('node-cmd');
@@ -18,9 +16,7 @@ var urlencodedParser = bodyParser.urlencoded({
     extended: false
 });
 
-var buffer = bufferFile('/etc/asterisk/sip_custom.conf');
 var myFile;
-var j = 0;
 
 function bufferFile(myPath){
     return fs.readFile(myPath, 'utf-8', function(err, data){
@@ -46,7 +42,7 @@ router.get('/dashboard',isAuthe,function (req,res,next) {
 });
 
 router.get('/', function(req, res, next) {
-    var date = new Date();
+    //var date = new Date();
     res.render('login',{veri:false});
 });
 

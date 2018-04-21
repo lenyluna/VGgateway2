@@ -16,19 +16,6 @@ var urlencodedParser = bodyParser.urlencoded({
     extended: false
 });
 
-var myFile;
-
-function bufferFile(myPath){
-    return fs.readFile(myPath, 'utf-8', function(err, data){
-        if(err){
-            console.log(err);
-        } else{
-            myFile = data;
-            console.log (myFile);
-        }
-    });
-}
-
 function isAuthe(req,res,next){
     if(req.session.username!=null){
         return next();

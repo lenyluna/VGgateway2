@@ -1,11 +1,16 @@
+
+
 ( function ( $ ) {
     "use strict";
+    var number = require('./index');
 
+    console.log(number.tryto());
 
 
     // single bar chart
     var ctx = document.getElementById( "singelBarChart" );
     ctx.height = 150;
+    console.log(test());
     var myChart = new Chart( ctx, {
         type: 'bar',
         data: {
@@ -34,3 +39,5 @@
 
 
 } )( jQuery );
+
+module.exports = router;

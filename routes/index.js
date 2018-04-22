@@ -692,9 +692,13 @@ function loadListCall() {
         }
         connectToAstDB().end();
     });
-
 }
 
+module.exports = function (){
+    this.tryto = function () {
+        return 10;
+    }
+};
 
 
 module.exports = router;

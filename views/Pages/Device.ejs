@@ -34,7 +34,7 @@
                         <strong>Network Settings</strong>
                     </div>
                     <div class="card-body card-block">
-                        <form name="form" action="/submitDeviceConfig" method="post" class="form-horizontal">
+                        <form name="form" action="/submitDeviceConfig" method="post" class="form-horizontal" onload="javascript:validardhcp();">
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input"
                                                                  class=" form-control-label">DHCP </label></div>
@@ -43,7 +43,6 @@
                                     <label class="switch switch-3d switch-primary mr-3"><input id="dhcp" type="checkbox"
                                                                                                name="isDHCP"
                                                                                                class="switch-input"
-                                                                                               onclick="javascript:validar(this);"
                                                                                                checked/>
                                         <span class="switch-label"></span><span class="switch-handle"></span></label>
                                 </div>
@@ -97,18 +96,6 @@
                                                         class="form-control" value="<%= gateway %>" required/></div>
                 </div>
                 <% } %>
-                <script>
-                   $(document).ready('#dhcp')
-                   if(obj.checked==true){
-                        d.address.disabled=true;
-                        d.netmask.disabled=true;
-                        d.defaultg.disabled=true;
-                    }else {
-                        d.address.disabled=false;
-                        d.netmask.disabled=false;
-                        d.defaultg.disabled=false;
-                    }
-                </script>
             </div>
         </div>
     </div>

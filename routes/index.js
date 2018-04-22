@@ -31,19 +31,6 @@ router.get('/dashboard',isAuthe,function (req,res,next) {
 
 router.get('/', function(req, res, next) {
     //var date = new Date();
-    var getGateway = "";
-    /*command.get('ip route',function(err, data, stderr) {
-         getGateway = cmdParser(data).between("via ", " dev").s;
-    });
-    var eth0 = os.getNetworkInterfaces().eth0;
-    var ipAddress = eth0[0].address;
-    var mask  = eth0[0].netmask;
-    var data = {
-        address: ipAddress,
-        netmask: mask,
-        gateway: getGateway
-    };
-    saveDeviceToDB(data);*/
     checkApply();
     res.render('login',{veri:false});
 });
@@ -293,7 +280,6 @@ function loadDeviceConfig(res,req){
         if (err) throw err;
             Object.keys(result).forEach(function (key) {
                 var row = result[key];
-                console.log("gateway to hell: " +row.gateway + "\n ip of hell: " + row.ip + "\n mask of hell: " +row.netmask + "\n dhellcp: " + row.type);
                 res.render('Device',{ip:row.ip,net:row.netmask, gateway: row.gateway, dhcp: row.type,user:req.session.username,power:power, apply: deviceApply});
             });
             connect().end();
@@ -358,6 +344,30 @@ function checkApply() {
                 if(data.length == 1){
                     applyRoute = true;
                 }
+            });
+        }
+        connect().end();
+    });
+
+
+    //console.log("data afuera: " +data.gateway);
+    connect().query("select * from eth0",function (error, result1) {
+
+        if(error) throw error;
+        if(result1.length != 0){
+            Object.keys(result1).forEach(function (key) {
+                InterfaceInfo(function (result2) {
+                    var row = result1[key];
+                    console.log("data: " +result2.dhcp + "\nrow: " + row.type);
+                    console.log("data: " +result2.address + "\nrow: " + row.ip);
+                    console.log("data: " +result2.netmask + "\nrow: " + row.netmask);
+                    console.log("data: " +result2.gateway + "\nrow: " + row.gateway);
+                    if(result2.address != row.ip || result2.netmask != row.netmask || result2.gateway != row.gateway || result2.dhcp != row.type){
+                        deviceApply = true;
+                        console.log("apply: " + deviceApply);
+                        console.log("data final: " +result2.gateway + "\nrow final: " + row.gateway);
+                    }
+                });
             });
         }
         connect().end();
@@ -624,14 +634,45 @@ function veriTrunk(res,req){
     connect().end();
 }
 
-function InterfaceInfo(res,req){
-    var eth0 = os.getNetworkInterfaces().eth0;
-    var ipAddress = eth0[0].address;
-    var mask  = eth0[0].netmask;
-    command.get('ip route',function(err, data, stderr) {
-        var getGateway = cmdParser(data).between("via ", " dev").s;
+function parseGateway(callback) {
+    var getGateway = "fokdisshit";
+    command.get('ip route',function(err, data) {
+        getGateway = callback(cmdParser(data).between('via ', ' dev').s);
     });
-    res.render('Device',{ip:ipAddress,net:mask,user:req.session.username,power:power, apply: deviceApply});
+    return getGateway;
+}
+
+function parseDHCP(callback) {
+    var isDHCP = null;
+    command.get(' cat /etc/network/interfaces',function(err, data1, stderr) {
+        if (cmdParser(data1).contains("dhcp")) {
+            isDHCP = callback('on');
+        }
+        else{
+            isDHCP = callback(null);
+        }
+    });
+    console.log("parsed dhcp: " +isDHCP);
+    return isDHCP;
+}
+
+function InterfaceInfo(callback){
+    var eth0 = os.getNetworkInterfaces().eth0;
+    var data = null;
+    parseGateway(function (result1) {
+        console.log("gateway: " + result1);
+        parseDHCP(function (result2) {
+            console.log("testest");
+            console.log("dhcp: " + result2)
+            data = callback({
+                address: eth0[0].address,
+                netmask: eth0[0].netmask,
+                gateway: result1,
+                dhcp: result2
+            });
+        });
+    });
+    return data;
 }
 
 function loadListUser (res,menj,username,privilegio,req){

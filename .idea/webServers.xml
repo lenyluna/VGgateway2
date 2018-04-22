@@ -2,8 +2,8 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="ad25afbc-ecab-44dd-b1ba-25b6cc86e878" name="VGgateway" url="http://192.168.2.106">
-        <fileTransfer host="192.168.2.106" port="21" rootFolder="/proyectoVG">
+      <webServer id="ad25afbc-ecab-44dd-b1ba-25b6cc86e878" name="VGgateway" url="http://192.168.2.13">
+        <fileTransfer host="192.168.2.13" port="21" rootFolder="/proyectoVG">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>

@@ -32,7 +32,7 @@ router.get('/dashboard',isAuthe,function (req,res,next) {
 router.get('/', function(req, res, next) {
     //var date = new Date();
     var getGateway = "";
-    command.get('ip route',function(err, data, stderr) {
+    /*command.get('ip route',function(err, data, stderr) {
          getGateway = cmdParser(data).between("via ", " dev").s;
     });
     var eth0 = os.getNetworkInterfaces().eth0;
@@ -43,7 +43,7 @@ router.get('/', function(req, res, next) {
         netmask: mask,
         gateway: getGateway
     };
-    saveDeviceToDB(data);
+    saveDeviceToDB(data);*/
     checkApply();
     res.render('login',{veri:false});
 });
@@ -156,10 +156,9 @@ router.get('/device', isAuthe,function(req, res, next) {
 
 router.post('/submitDeviceConfig', isAuthe,function(req, res, next) {
     var data = req.body;
-    command.get("ip route");
-    saveDeviceToDB(data);
+    console.log("el maldito gayway: " + data.defaultg);
+    saveDeviceToDB(data, req, res);
     deviceApply = true;
-    loadDeviceConfig(res,req);
 });
 
 
@@ -294,27 +293,32 @@ function loadDeviceConfig(res,req){
         if (err) throw err;
             Object.keys(result).forEach(function (key) {
                 var row = result[key];
+                console.log("gateway to hell: " +row.gateway + "\n ip of hell: " + row.ip + "\n mask of hell: " +row.netmask + "\n dhellcp: " + row.type);
                 res.render('Device',{ip:row.ip,net:row.netmask, gateway: row.gateway, dhcp: row.type,user:req.session.username,power:power, apply: deviceApply});
             });
             connect().end();
         });
 }
 
-function saveDeviceToDB(data){
+function saveDeviceToDB(data, req, res){
     connect().query('select id from eth0 where id =1', function (err, result) {
         if(err) throw err;
         if(result.length == 0){
             connect().query('insert into eth0 values (?,?,?,?,?)', [1,data.address, data.netmask, data.defaultg, data.isDHCP], function (err,result) {
                 if (err) throw err;
-                // console.log("Number of records inserted: " + result.affectedRows);
+                console.log("gateway: " + data.defaultg);
                 connect().end();
+                loadDeviceConfig(res,req);
             });
         }
         else{
-            connect().query('update eth0 set ip = ?, netmask = ?, gateway = ?, type = ?', [data.address, data.netmask, data.defaultg, data.isDHCP], function (err,result) {
+            console.log("gateway before update: " + data.defaultg);
+            connect().query('update eth0 set ip = ?, netmask = ?, gateway = ?, type = ? where id=1', [data.address, data.netmask, data.defaultg, data.isDHCP], function (err,result) {
                 if (err) throw err;
-                // console.log("Number of records inserted: " + result.affectedRows);
+                console.log("Number of records inserted: " + result.affectedRows);
+                console.log("gateway after update: " + data.defaultg);
                 connect().end();
+                loadDeviceConfig(res,req);
             });
         }
     });

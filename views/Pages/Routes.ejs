@@ -242,11 +242,20 @@
                         </button>
                         <% } %>
         </form>
+        <% if (mensaje==true){%>
         <a href="/Routes">
-            <button type="button" class="btn btn-danger btn-sm" style="margin-top: 10px"><i
+            <button type="button" class="btn btn-danger btn-sm" style="margin-top: 10px" disabled><i
                         class="fa fa-times"></i> Cancel
             </button>
         </a>
+        <%}else {%>
+        <a href="/Routes">
+            <button type="button" class="btn btn-danger btn-sm" style="margin-top: 10px" disabled><i
+                        class="fa fa-times"></i> Cancel
+            </button>
+        </a>
+        <%}%>
+
 </div>
 </div>
 </div>

@@ -34,7 +34,7 @@
                         <strong>Network Settings</strong>
                     </div>
                     <div class="card-body card-block">
-                        <form name="form" action="/submitDeviceConfig" method="post" class="form-horizontal" onload="javascript:validardhcp();">
+                        <form name="form" action="/submitDeviceConfig" method="post" class="form-horizontal" onload="javascript:validar(this,'<%=ip%>','<%=net%>','<%=gateway%>');">
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input"
                                                                  class=" form-control-label">DHCP </label></div>
@@ -52,26 +52,26 @@
                                         Address</label></div>
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="address"
                                                                     class="form-control"
-                                                                    style="moz-placeholder: stalic" value="<%= ip %>"/>
+                                                                    style="moz-placeholder: stalic" value="<%= ip %>" disabled/>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="password-input" class=" form-control-label">Netmask</label>
                                 </div>
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="netmask"
-                                                                    class="form-control" value="<%= net %>"/></div>
+                                                                    class="form-control" value="<%= net %>" disabled/></div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input" class=" form-control-label">Default
                                         Gateway</label></div>
                                 <div class="col-12 col-md-9"><input type="text" id="password-input" name="defaultg"
-                                                                    class="form-control" value="<%= gateway %>"/></div>
+                                                                    class="form-control" value="<%= gateway %>" disabled/></div>
                             </div>
                             <% } else { %>
                             <label class="switch switch-3d switch-primary mr-3"><input type="checkbox"
                                                                                        name="isDHCP"
                                                                                        class="switch-input"
-                                                                                       onclick="javascript:validar(this);"/>
+                                                                                       onclick="javascript:validar(this,'<%=ip%>','<%=net%>','<%=gateway%>');"/>
                                 <span class="switch-label"></span><span class="switch-handle"></span></label>
                     </div>
                 </div>

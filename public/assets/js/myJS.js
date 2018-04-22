@@ -1,13 +1,20 @@
-function validar (obj){
+function validar (obj,ip,net,gateway){
 var d = document.form;
 if(obj.checked==true){
-	d.address.disabled=true;
-	d.netmask.disabled=true;
-	d.defaultg.disabled=true;
+    alert('papa');
+	d.address.value="";
+    d.netmask.value="";
+    d.defaultg.value="";
+    d.address.disabled=true;
+    d.netmask.disabled=true;
+    d.defaultg.disabled=true;
 }else {
-	d.address.disabled=false;
-	d.netmask.disabled=false;
-	d.defaultg.disabled=false;
+    d.address.disabled=false;
+    d.netmask.disabled=false;
+    d.defaultg.disabled=false;
+    d.address.value=ip;
+    d.netmask.value=net;
+    d.defaultg.value=gateway;
 }
 
 }

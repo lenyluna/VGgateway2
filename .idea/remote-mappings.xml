@@ -59,6 +59,13 @@
             </list>
           </settings>
         </remote-mappings>
+        <remote-mappings server-id="NodeJS@ssh://root@192.168.2.56:22">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$" remote-root="/proyectoVG" />
+            </list>
+          </settings>
+        </remote-mappings>
       </list>
     </list>
   </component>

@@ -30,6 +30,7 @@ router.get('/dashboard',isAuthe,function (req,res,next) {
 
 router.get('/', function(req, res, next) {
     //var date = new Date();
+    checkApply();
     res.render('login',{veri:false});
 });
 
@@ -91,7 +92,6 @@ router.post('/SavePass', function(req, res, next) {
     connect().end();
 });
 router.get('/Routes',isAuthe, function(req, res, next) {
-    applyRoute = false;
    checkNloadRoute(res,req);
 });
 
@@ -102,32 +102,18 @@ router.get('/applyRoutes',isAuthe, function(req, res, next) {
     res.redirect("/Routes");
 });
 
-
 router.post('/saveRoutes', urlencodedParser, function(req, res, next) {
     var getData = req.body;
     var number = parsePhoneNum(getData.phoneNum);
     connect().query('insert into routes values (?,?,?,?,?)', [1,getData.trunkName, getData.dialPattern, number, getData.redirect], function (err,result) {
         if (err) throw err;
-        console.log("Number of records inserted: " + result.affectedRows);
+       // console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
     });
-    connect().query('select id_trunk from trunk', function (err,result) {
-        if (err) throw err;
-        if(result.length != 0){
-            connect().query('insert into trunkRoute values (?,?,?)',[1,1,1], function (err,result) {
-                if (err) throw err;
-                console.log("Number of records inserted: " + result.affectedRows);
-                connect().end();
-            });
-        }
-        else{
-            console.log("No se ha Creado el Trunk!");
-        }
-        connect().end();
-    });
+
     modifyRoute = true;
     applyRoute = true;
-    console.log(number + getData.dialPattern + getData.trunkName + getData.redirect);
+    //console.log(number + getData.dialPattern + getData.trunkName + getData.redirect);
     checkNloadRoute(res,req);
 });
 
@@ -200,17 +186,14 @@ router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
 });
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
-    var done = 0;
     connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
         if (err) throw err;
-        done++;
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
     });
 
     connect().query('INSERT INTO incoming VALUES (?,?,?,?,?)',[1,data.usernameI,data.passwordI,'from-trunk','peer'],function (err, result) {
         if (err) throw err;
-        done++;
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
     });
@@ -229,27 +212,23 @@ function saveTrunk(){
 
 router.post('/device/guardar',function(req, res, next) {
     var data = req.body;
+    console.log("info: " +data.address);
+    var write ="";
+    saveNetwork(write);
     if(data.isDHCP=='on'){
-        var interfaces= setup.network.config({
-            eth0: {
-                auto: true,
-                dhcp: true
-            }
-        });
+        write = "source-directory /etc/network/interfaces.d\n" +
+            "auto eth0\n" +
+            "iface eth0 inet dhcp\n";
+        saveNetwork(write);
     }else {
-        var interfaces= setup.network.config({
-            eth0: {
-                auto: true,
-                ipv4: {
-                    address: data.address,
-                    netmask: data.netmask,
-                    gateway: data.defaultg
-                }
-            }
-        });
+        write = "source-directory /etc/network/interfaces.d\n" +
+            "auto eth0\n" +
+            "iface eth0 inet static\n" +
+            "address " + data.address +"\n" +
+            "netmask " + data.netmask +"\n" +
+            "gateway " + data.defaultg +"\n";
+        saveNetwork(write);
     }
-    setup.network.save(interfaces);
-    command.run('/etc/init.d/networking reload');
     command.run('reboot');
     res.redirect("/device");
 });
@@ -281,6 +260,45 @@ router.post('/newUser',function(req, res, next){
 });
 
 // funciones
+
+function saveNetwork(data){
+    fs.writeFile('/etc/network/interfaces',data,function(err) {
+        if (err) {
+            throw err;
+        } else {
+            console.log('Guardado Satisfactoriamente');
+        }
+    });
+}
+
+function checkApply() {
+    connect().query("select * from trunk",function (error, result) {
+        if(error) throw error;
+        if(result.length != 0){
+            fs.readFile('/etc/asterisk/sip_custom.conf', function(err, data){
+                if(err) throw err;
+                if(data.length == 1){
+                    mensajeApply = true;
+                }
+            });
+        }
+        connect().end();
+    });
+
+    connect().query("select * from routes",function (error, result) {
+        if(error) throw error;
+        if(result.length != 0){
+            fs.readFile('/etc/asterisk/extensions_custom.conf', function(err, data){
+                if(err) throw err;
+                if(data.length == 1){
+                    applyRoute = true;
+                }
+            });
+        }
+        connect().end();
+    });
+}
+
 function parsePhoneNum(phoneNum) {
     var split1 = phoneNum.split('(');
     var split2 = split1[1].split(')');
@@ -393,7 +411,7 @@ function writeFile(){
                 +"\n["+row.userIn+"]\n"+"secret="+row.secretIn+"\ntype="+row.typeIn+"\ncontext="+row.contextIn+"\n\n[2021]\n"+"type=friend\n"
                 +"host=dynamic\n"+"secret=rl123\n"+"context=from-trunk\n"+"callerid='Ricardo Luna'<2021>\n"
                 +"\n[2022]\n"+"type=friend\n"+"host=dynamic\n"+"secret=leny123\n"+"context=from-internal\n"+"callerid='Leny Luna' <2022>";
-            console.log(infoOut);
+            //console.log(infoOut);
            save(infoOut);
         });
         connect().end();
@@ -435,7 +453,6 @@ function save(data){
 function trunkInf(res,req){
 connect().query("Select trunk_name,host from outgoing", function(err,result){
     if  (err) throw err;
-    console.log("fokiu " + result.length);
     if(result.length != 0){
         Object.keys(result).forEach(function(key) {
             var row = result[key];
@@ -446,7 +463,6 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
                 connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result2) {
                     if (err) throw err;
                     if (result2.length != 0) {
-                        console.log("trunk name: " + row.trunk_name + "\n host: " + row.host + "\n ip address: " + myip.address() + "\nlog length: " + result2.length);
                         res.render('index', {
                             trunkname: row.trunk_name,
                             saddress: myip.address(),
@@ -464,7 +480,6 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
         connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result2) {
             if (err) throw err;
             if (result2.length != 0) {
-                //console.log("trunk name: " + row.trunk_name + "\n host: " + row.host + "\n ip address: " + myip.address() + "\nlog length: " + result2.length);
                 res.render('index', {
                     trunkname: null,
                     saddress: null,
@@ -489,7 +504,6 @@ function checkNloadRoute(res,req) {
             connect().query('select trunkName,dialPattern,phoneNum,redirect from routes;', function (err,result) {
                 Object.keys(result).forEach(function(key) {
                     var row = result[key];
-                    console.log("To la droga: " + row.trunkName +"\n"+ row.dialPattern +"\n"+ row.phoneNum +"\n"+ row.redirect+"\n");
                     res.render('Routes',{modify:modifyRoute,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,redirect:row.redirect,user:req.session.username,mensaje:false,power:power});
                 });
                 connect().end();
@@ -546,10 +560,10 @@ function veriTrunk(res,req){
 }
 
 function InterfaceInfo(res,req){
-    var eth0 = os.getNetworkInterfaces().wlan0;
+    var eth0 = os.getNetworkInterfaces().eth0;
     var ipAddress = eth0[0].address;
     var mask  = eth0[0].netmask;
-   // var gateway //falta gateway
+   console.log("interfaz: "+eth0.gateway);
     res.render('Device',{ip:ipAddress,net:mask,user:req.session.username,power:power});
 }
 

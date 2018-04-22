@@ -30,9 +30,8 @@ function original(){
 function tableNormal(index){
     document.getElementById('dele').style.display= 'none';
     document.getElementById('dNolmal').style.display='block';
-    for(var i=index-1;i>0;i--){
+    for(var i=0;i<index;i++){
         var valor = "check"+i;
-        alert("ckeck"+i);
         document.getElementById(valor).style.display = 'none';
     }
     document.getElementById('titleCheck').style.display = 'none';
@@ -62,8 +61,22 @@ function table(index){
     }
 }
 
+
+function tableDefault(index) {
+    for(var i=0;i<index;i++){
+        var valor = "check"+i;
+        if(document.getElementById(valor)!=null){
+            document.getElementById(valor).style.display = 'none';
+        }
+    }
+    document.getElementById('dele').style.display='none';
+    document.getElementById('dNolmal').style.display='block';
+    document.getElementById('titleCheck').style.display = 'none';
+}
+
 function eliminar(index){
     var posEli = [];
+    var total = document.getElementById('bootstrap-data-table').rows.length;
     for(var i=0;i<index;i++){
         var valor = "ch"+i;
         if(document.getElementById(valor).checked == true){
@@ -74,9 +87,8 @@ function eliminar(index){
     for(var j=posEli.length-1;j>0;j--){
         if(posEli[j]!=null){
             document.getElementById("bootstrap-data-table").deleteRow(posEli[j]+1);
-            index--;
         }
 
     }
-  tableNormal(index-posEli.length);
+    tableDefault(total);
 }

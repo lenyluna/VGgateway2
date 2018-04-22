@@ -7,6 +7,7 @@ var command = require('node-cmd');
 var mensajeApply = false;
 var applyRoute = false;
 var modifyRoute = false;
+var deviceApply = false;
 var myip = require('ip');
 var cmdParser = require('string');
 var  os = require('os'); //para leer la direccion ip del VG gateway
@@ -30,6 +31,19 @@ router.get('/dashboard',isAuthe,function (req,res,next) {
 
 router.get('/', function(req, res, next) {
     //var date = new Date();
+    var getGateway = "";
+    command.get('ip route',function(err, data, stderr) {
+         getGateway = cmdParser(data).between("via ", " dev").s;
+    });
+    var eth0 = os.getNetworkInterfaces().eth0;
+    var ipAddress = eth0[0].address;
+    var mask  = eth0[0].netmask;
+    var data = {
+        address: ipAddress,
+        netmask: mask,
+        gateway: getGateway
+    };
+    saveDeviceToDB(data);
     checkApply();
     res.render('login',{veri:false});
 });
@@ -137,9 +151,17 @@ router.get('/manageUser',isAuthe, function(req, res, next) {
 });
 
 router.get('/device', isAuthe,function(req, res, next) {
-    InterfaceInfo(res,req);
-
+    loadDeviceConfig(res,req);
 });
+
+router.post('/submitDeviceConfig', isAuthe,function(req, res, next) {
+    var data = req.body;
+    command.get("ip route");
+    saveDeviceToDB(data);
+    deviceApply = true;
+    loadDeviceConfig(res,req);
+});
+
 
 router.get('/ConfiguracionTrunk',isAuthe, function(req, res, next) {
     veriTrunk(res,req);
@@ -205,30 +227,36 @@ router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) 
 function saveTrunk(){
     connect().query("INSERT INTO trunk VALUES (1,1,1)",function (error) {
         if(error) throw error;
-        done = 0;
         connect().end();
     });
 }
 
-router.post('/device/guardar',function(req, res, next) {
-    var data = req.body;
-    console.log("info: " +data.address);
-    var write ="";
-    saveNetwork(write);
-    if(data.isDHCP=='on'){
-        write = "source-directory /etc/network/interfaces.d\n" +
-            "auto eth0\n" +
-            "iface eth0 inet dhcp\n";
-        saveNetwork(write);
-    }else {
-        write = "source-directory /etc/network/interfaces.d\n" +
-            "auto eth0\n" +
-            "iface eth0 inet static\n" +
-            "address " + data.address +"\n" +
-            "netmask " + data.netmask +"\n" +
-            "gateway " + data.defaultg +"\n";
-        saveNetwork(write);
-    }
+router.get('/applyDeviceConfig',function(req, res, next) {
+    connect().query("select * from eth0",function (error, result) {
+        if(error) throw error;
+        Object.keys(result).forEach(function (value){
+            var row = result[value];
+            var write ="";
+            saveNetwork(write);
+            if(row.type=='on'){
+                write = "source-directory /etc/network/interfaces.d\n" +
+                    "auto eth0\n" +
+                    "iface eth0 inet dhcp\n";
+                saveNetwork(write);
+            }else {
+                write = "source-directory /etc/network/interfaces.d\n" +
+                    "auto eth0\n" +
+                    "iface eth0 inet static\n" +
+                    "address " + row.ip +"\n" +
+                    "netmask " + row.netmask +"\n" +
+                    "gateway " + row.gateway +"\n";
+                saveNetwork(write);
+            }
+        });
+        connect().end();
+    });
+
+    deviceApply = false;
     command.run('reboot');
     res.redirect("/device");
 });
@@ -261,6 +289,38 @@ router.post('/newUser',function(req, res, next){
 
 // funciones
 
+function loadDeviceConfig(res,req){
+    connect().query('select * from eth0', function (err,result) {
+        if (err) throw err;
+            Object.keys(result).forEach(function (key) {
+                var row = result[key];
+                res.render('Device',{ip:row.ip,net:row.netmask, gateway: row.gateway, dhcp: row.type,user:req.session.username,power:power, apply: deviceApply});
+            });
+            connect().end();
+        });
+}
+
+function saveDeviceToDB(data){
+    connect().query('select id from eth0 where id =1', function (err, result) {
+        if(err) throw err;
+        if(result.length == 0){
+            connect().query('insert into eth0 values (?,?,?,?,?)', [1,data.address, data.netmask, data.defaultg, data.isDHCP], function (err,result) {
+                if (err) throw err;
+                // console.log("Number of records inserted: " + result.affectedRows);
+                connect().end();
+            });
+        }
+        else{
+            connect().query('update eth0 set ip = ?, netmask = ?, gateway = ?, type = ?', [data.address, data.netmask, data.defaultg, data.isDHCP], function (err,result) {
+                if (err) throw err;
+                // console.log("Number of records inserted: " + result.affectedRows);
+                connect().end();
+            });
+        }
+    });
+}
+
+
 function saveNetwork(data){
     fs.writeFile('/etc/network/interfaces',data,function(err) {
         if (err) {
@@ -272,6 +332,7 @@ function saveNetwork(data){
 }
 
 function checkApply() {
+
     connect().query("select * from trunk",function (error, result) {
         if(error) throw error;
         if(result.length != 0){
@@ -563,8 +624,10 @@ function InterfaceInfo(res,req){
     var eth0 = os.getNetworkInterfaces().eth0;
     var ipAddress = eth0[0].address;
     var mask  = eth0[0].netmask;
-   console.log("interfaz: "+eth0.gateway);
-    res.render('Device',{ip:ipAddress,net:mask,user:req.session.username,power:power});
+    command.get('ip route',function(err, data, stderr) {
+        var getGateway = cmdParser(data).between("via ", " dev").s;
+    });
+    res.render('Device',{ip:ipAddress,net:mask,user:req.session.username,power:power, apply: deviceApply});
 }
 
 function loadListUser (res,menj,username,privilegio,req){

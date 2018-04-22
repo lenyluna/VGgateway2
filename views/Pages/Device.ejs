@@ -13,6 +13,15 @@
         </div>
     </div>
 </div>
+
+<% if(apply){ %>
+<div class="col-sm-12">
+    <div class="sufee-alert alert with-close alert-danger alert-dismissible fade show" role="alert" align="center">
+        <a href="/applyDeviceConfig"> Apply Config </a>
+    </div>
+</div>
+<% } %>
+
 <div class="content mt-3">
 
     <div class="animated fadeIn">
@@ -25,15 +34,17 @@
                         <strong>Network Settings</strong>
                     </div>
                     <div class="card-body card-block">
-                        <form name="form" action="/device/guardar" method="post" class="form-horizontal">
+                        <form name="form" action="/submitDeviceConfig" method="post" class="form-horizontal">
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input"
                                                                  class=" form-control-label">DHCP </label></div>
                                 <div class="col-12 col-md-9">
-                                    <label class="switch switch-3d switch-primary mr-3"><input type="checkbox"
+                                    <% if(dhcp == 'on') { %>
+                                    <label class="switch switch-3d switch-primary mr-3"><input id="dhcp" type="checkbox"
                                                                                                name="isDHCP"
                                                                                                class="switch-input"
-                                                                                               onclick="javascript:validar(this);" >
+                                                                                               onclick="javascript:validar(this);"
+                                                                                               checked/>
                                         <span class="switch-label"></span><span class="switch-handle"></span></label>
                                 </div>
                             </div>
@@ -42,47 +53,88 @@
                                         Address</label></div>
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="address"
                                                                     class="form-control"
-                                                                    style="moz-placeholder: stalic" value="<%= ip %>"/></div>
+                                                                    style="moz-placeholder: stalic" value="<%= ip %>"/>
+                                </div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="password-input" class=" form-control-label">Netmask</label>
                                 </div>
                                 <div class="col-12 col-md-9"><input type="text" id="text-input" name="netmask"
-                                                                    class="form-control" value="<%=net %>" /></div>
+                                                                    class="form-control" value="<%= net %>"/></div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input" class=" form-control-label">Default
                                         Gateway</label></div>
                                 <div class="col-12 col-md-9"><input type="text" id="password-input" name="defaultg"
-                                                                    class="form-control" /></div>
+                                                                    class="form-control" value="<%= gateway %>"/></div>
                             </div>
-
-
+                            <% } else { %>
+                            <label class="switch switch-3d switch-primary mr-3"><input type="checkbox"
+                                                                                       name="isDHCP"
+                                                                                       class="switch-input"
+                                                                                       onclick="javascript:validar(this);"/>
+                                <span class="switch-label"></span><span class="switch-handle"></span></label>
                     </div>
                 </div>
-            </div>
-            <div class="breadcrumbs">
-                <div class="col-sm-12">
-                    <div class="page-header float-right">
-                        <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 10px"><i
-                                    class="fa fa-check"></i> Modify
-                        </button>
-            </form>
-
-                        <a href="/device">
-                            <button type="submit" class="btn btn-danger btn-sm" style="margin-top: 10px"><i class="fa fa-times"></i> Cancel
-                            </button>
-                        </a>
+                <div class="row form-group">
+                    <div class="col col-md-3"><label for="text-input" class=" form-control-label">IP
+                            Address</label></div>
+                    <div class="col-12 col-md-9"><input type="text" id="text-input" name="address"
+                                                        class="form-control"
+                                                        style="moz-placeholder: stalic" value="<%= ip %>" required/>
                     </div>
                 </div>
+                <div class="row form-group">
+                    <div class="col col-md-3"><label for="password-input" class=" form-control-label">Netmask</label>
+                    </div>
+                    <div class="col-12 col-md-9"><input type="text" id="text-input" name="netmask"
+                                                        class="form-control" value="<%= net %>" required/></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3"><label for="text-input" class=" form-control-label">Default
+                            Gateway</label></div>
+                    <div class="col-12 col-md-9"><input type="text" id="password-input" name="defaultg"
+                                                        class="form-control" value="<%= gateway %>" required/></div>
+                </div>
+                <% } %>
+                <script>
+                   $(document).ready('#dhcp')
+                   if(obj.checked==true){
+                        d.address.disabled=true;
+                        d.netmask.disabled=true;
+                        d.defaultg.disabled=true;
+                    }else {
+                        d.address.disabled=false;
+                        d.netmask.disabled=false;
+                        d.defaultg.disabled=false;
+                    }
+                </script>
             </div>
-        </div><!-- .content -->
-        </div><!-- /#right-panel -->
+        </div>
+    </div>
+    <div class="breadcrumbs">
+        <div class="col-sm-12">
+            <div class="page-header float-right">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 10px"><i
+                            class="fa fa-check"></i> Modify
+                </button>
+                </form>
 
-        <!-- Right Panel -->
+                <a href="/device">
+                    <button type="submit" class="btn btn-danger btn-sm" style="margin-top: 10px"><i
+                                class="fa fa-times"></i> Cancel
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div><!-- .content -->
+</div><!-- /#right-panel -->
 
-        <% include ../Partials/footer %>
+<!-- Right Panel -->
+
+<% include ../Partials/footer %>
 
 </body>
-<script src="assets/js/myJS.js" type="text/javascript"> </script>
+<script src="assets/js/myJS.js" type="text/javascript"></script>
 </html>

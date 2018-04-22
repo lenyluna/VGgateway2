@@ -29,12 +29,13 @@ function original(){
 
 function tableNormal(index){
     document.getElementById('dele').style.display= 'none';
-    document.getElementById('titleCheck').style.display = 'none';
     document.getElementById('dNolmal').style.display='block';
-    for(var i=0;i<index;i++){
+    for(var i=index-1;i>0;i--){
         var valor = "check"+i;
+        alert("ckeck"+i);
         document.getElementById(valor).style.display = 'none';
     }
+    document.getElementById('titleCheck').style.display = 'none';
 
 }
 function tableMostrar(index) {
@@ -46,20 +47,36 @@ function tableMostrar(index) {
         document.getElementById('dele').style.display='block';
         document.getElementById('dNolmal').style.display='none';
 }
-function table(obj){
-    if(obj.checked==true) {
+function table(index){
+    var count=0;
+    for(var i=0;i<index;i++){
+        var valor = "ch"+i;
+        if(document.getElementById(valor).checked == true){
+            count++;
+        }
+    }
+    if(count!=0){
         document.getElementById('btnconfirm').disabled = false;
-    }else {
+    }else{
         document.getElementById('btnconfirm').disabled = true;
     }
 }
 
 function eliminar(index){
+    var posEli = [];
     for(var i=0;i<index;i++){
         var valor = "ch"+i;
         if(document.getElementById(valor).checked == true){
              $.get("/deleteUser/"+document.getElementById(valor).getAttribute('name'));
-            document.getElementById("bootstrap-data-table").deleteRow(i+1);
+             posEli[i] = i;
         }
     }
+    for(var j=posEli.length-1;j>0;j--){
+        if(posEli[j]!=null){
+            document.getElementById("bootstrap-data-table").deleteRow(posEli[j]+1);
+            index--;
+        }
+
+    }
+  tableNormal(index-posEli.length);
 }

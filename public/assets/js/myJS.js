@@ -30,7 +30,7 @@ function original(){
     document.getElementById('dNolmal').style.display='block';
     document.getElementById('dadd').style.display='none';
     document.getElementById('menj').style.display='none';
-
+    document.getElementById('usuarioActual').style.display='none';
 }
 
 function tableNormal(index){
@@ -41,6 +41,7 @@ function tableNormal(index){
         document.getElementById(valor).style.display = 'none';
     }
     document.getElementById('titleCheck').style.display = 'none';
+    document.getElementById('usuarioActual').style.display='none';
 
 }
 function tableMostrar(index) {
@@ -80,14 +81,19 @@ function tableDefault(index) {
     document.getElementById('titleCheck').style.display = 'none';
 }
 
-function eliminar(index){
+function eliminar(index,id){
     var posEli = [];
     var total = document.getElementById('bootstrap-data-table').rows.length;
     for(var i=0;i<index;i++){
         var valor = "ch"+i;
         if(document.getElementById(valor).checked == true){
-             $.get("/deleteUser/"+document.getElementById(valor).getAttribute('name'));
-             posEli[i] = i;
+            if(id==document.getElementById(valor).getAttribute('name')){
+                document.getElementById('usuarioActual').style.display='block';
+                document.getElementById(valor).checked = false;
+            }else {
+                $.get("/deleteUser/" + document.getElementById(valor).getAttribute('name'));
+                posEli[i] = i;
+            }
         }
     }
     for(var j=posEli.length-1;j>0;j--){
@@ -98,3 +104,5 @@ function eliminar(index){
     }
     tableDefault(total);
 }
+
+id="usuarioActual"

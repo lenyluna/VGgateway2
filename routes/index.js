@@ -719,7 +719,7 @@ function loadListUser (res,menj,username,privilegio,req){
     connect().query("Select id,username,rol from user",function(err,result){
         if (err) throw err;
         if(result.length!=0){
-            res.render('manageUsers',{list:result,mensaje:menj,user1:username,privi1:privilegio,user:req.session.username,power:power});
+            res.render('manageUsers',{list:result,mensaje:menj,user1:username,privi1:privilegio,user:req.session.username,power:power,userid:req.session.userid});
         }
     });
     connect().end();

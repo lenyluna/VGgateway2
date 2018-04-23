@@ -1,7 +1,6 @@
 function validar (obj,ip,net,gateway){
 var d = document.form;
 if(obj.checked==true){
-    alert('papa');
 	d.address.value="";
     d.netmask.value="";
     d.defaultg.value="";

@@ -13,6 +13,7 @@ var cmdParser = require('string');
 var  os = require('os'); //para leer la direccion ip del VG gateway
 var setup = require ('setup'); //para poner la configuracion de la ip
 var mysql = require('mysql');
+var listSession = [];
 var urlencodedParser = bodyParser.urlencoded({
     extended: false
 });
@@ -26,13 +27,18 @@ function isAuthe(req,res,next){
 }
 // comment
 router.get('/dashboard',isAuthe,function (req,res,next) {
+    console.log('List Sessiones' +listSession.length);
     trunkInf(res,req);
 });
 
 router.get('/', function(req, res, next) {
     //var date = new Date();
-    checkApply();
-    res.render('login',{veri:false});
+    if(req.session.username!=null && req.session.address== req.connection.remoteAddress){
+        res.redirect('/dashboard');
+    }else{
+        checkApply();
+        res.render('login',{veri:false,menjSession:""});
+    }
 });
 
 router.post('/login', function(req, res, next) {
@@ -45,17 +51,26 @@ router.post('/login', function(req, res, next) {
                     console.log("Login satisfactorio");
                     if(save=='on'){
                     }
-                    req.session.userid =result[0].id ;
-                    req.session.username = result[0].username;
-                    if(result[0].rol == "Admin"){
-                        power=true;
-                    }else {
-                        power=false;
+                    if(checkS(result[0].id)){
+                        console.log("entro donde existe");
+                        res.render('login', {veri: false, menjSession:"Someone is already logged in with that user!"});
+                    }else{
+                        console.log("no existe");
+                        req.session.userid =result[0].id ;
+                        req.session.username = result[0].username;
+                        req.session.address = req.connection.remoteAddress;
+                        listSession.push(result[0].id);
+                        if(result[0].rol == "Admin"){
+                            power=true;
+                        }else {
+                            power=false;
+                        }
+                        res.redirect('/dashboard');
                     }
-                    res.redirect('/dashboard');
+
                 } else {
                     console.log("Informaciones incorrectas");
-                    res.render('login', {user: username, veri: true});
+                    res.render('login', {user: username, veri: true,menjSession:""});
                 }
         connect().end();
     });
@@ -69,6 +84,25 @@ router.get('/changePass',isAuthe, function(req, res, next) {
     res.render('ChangePassword',{user:req.session.username,menj:"",power:power});
 });
 
+function checkS(id){
+    var exist= false;
+    for(var i=0;i<listSession.length;i++){
+        if(listSession[i]==id){
+           return true;
+        }
+    }
+
+}
+/*function checkSession(id, callback){
+    var exist= callback(false);
+   for(var i=0;i<listSession.length;i++){
+       if(listSession[i]==id){
+           exist = callback(true);
+       }
+   }
+   return exist;
+}
+*/
 router.post('/SavePass', function(req, res, next) {
     var oldPass = req.body.oldP;
     var newPass = req.body.newP;
@@ -161,9 +195,10 @@ router.get('/ConfiguracionTrunk/applyConf',isAuthe, function(req, res, next) {
 });
 
 router.get('/logout',isAuthe,function(req,res,next){
+    var index = listSession.indexOf(req.session.userid);
+    var removed= listSession.splice(index,1);
    req.session.destroy();
    res.redirect('/');
-
 });
 
 

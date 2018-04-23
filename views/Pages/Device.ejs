@@ -34,7 +34,7 @@
                         <strong>Network Settings</strong>
                     </div>
                     <div class="card-body card-block">
-                        <form name="form" action="/submitDeviceConfig" method="post" class="form-horizontal" onload="javascript:validar(this,'<%=ip%>','<%=net%>','<%=gateway%>');">
+                        <form name="form" action="/submitDeviceConfig" method="post" class="form-horizontal" >
                             <div class="row form-group">
                                 <div class="col col-md-3"><label for="text-input"
                                                                  class=" form-control-label">DHCP </label></div>
@@ -43,7 +43,8 @@
                                     <label class="switch switch-3d switch-primary mr-3"><input id="dhcp" type="checkbox"
                                                                                                name="isDHCP"
                                                                                                class="switch-input"
-                                                                                               checked/>
+                                                                                               onclick="javascript:validar(this,'<%=ip%>','<%=net%>','<%=gateway%>');"
+                                                                                               checked />
                                         <span class="switch-label"></span><span class="switch-handle"></span></label>
                                 </div>
                             </div>

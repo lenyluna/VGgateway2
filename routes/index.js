@@ -27,7 +27,6 @@ function isAuthe(req,res,next){
 }
 // comment
 router.get('/dashboard',isAuthe,function (req,res,next) {
-    console.log('List Sessiones' +listSession.length);
     trunkInf(res,req);
 });
 
@@ -52,10 +51,8 @@ router.post('/login', function(req, res, next) {
                     if(save=='on'){
                     }
                     if(checkS(result[0].id)){
-                        console.log("entro donde existe");
                         res.render('login', {veri: false, menjSession:"Someone is already logged in with that user!"});
                     }else{
-                        console.log("no existe");
                         req.session.userid =result[0].id ;
                         req.session.username = result[0].username;
                         req.session.address = req.connection.remoteAddress;
@@ -112,17 +109,25 @@ router.post('/SavePass', function(req, res, next) {
         connect().query("select * from user where password=? and  id=?",[oldPass,id],function (error,result) {
             if(error) throw error;
             if(result.length!=0 ){
-                connect().query('UPDATE user set password=? where id=?',
-                    [newPass,id],function (err) {
-                        if (err) throw err;
-                        res.render('ChangePassword',{user:req.session.username,menj:"The changes was successful"});
-                    });
+                if(oldPass==newPass){
+                    res.render('ChangePassword',{user:req.session.username,menj:"Old password matched new password. Please type a different.",power:power});
+                }else {
+                    connect().query('UPDATE user set password=? where id=?',
+                        [newPass, id], function (err) {
+                            if (err) throw err;
+                            res.render('ChangePassword', {
+                                user: req.session.username,
+                                menj: "The changes was successful",
+                                power:power
+                            });
+                        });
+                }
             }else {
-                res.render('ChangePassword',{user:req.session.username,menj:"The old password is incorrect"});
+                res.render('ChangePassword',{user:req.session.username,menj:"The old password is incorrect",power:power});
             }
         });
     }else {
-        res.render('ChangePassword',{user:req.session.username,menj:"The new password doesn't match"});
+        res.render('ChangePassword',{user:req.session.username,menj:"The new password doesn't match",power:power});
     }
     connect().end();
 });

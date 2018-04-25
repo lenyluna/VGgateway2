@@ -8,41 +8,56 @@
 <!-- Right Panel -->
 <div class="content mt-3">
     <div class="animated fadeIn">
-<div class="row">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mb-3">Amount of calls/day</h4>
+                        <canvas id="singelBarChart"></canvas>
 
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <strong class="card-title">Trunks Table</strong>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <table id="tableInfo" class="table" align="center">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th>Trunk Name</th>
-                        <th>Source Address</th>
-                        <th>Destination Address</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <%if(trunkname != null && saddress != null && daddress != null && status != null){%>
-                    <tr>
-                        <td><%=trunkname%></td>
-                        <td><%=saddress%></td>
-                        <td><%=daddress%></td>
-                        <td><%=status%></td>
-                    </tr>
-                    <%}%>
-                    </tbody>
-                </table>
+
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mb-3">Minutes talked/day</h4>
+                        <canvas id="durationBarChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-
         <div class="row">
-
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <strong class="card-title">Trunks Table</strong>
+                    </div>
+                    <div class="card-body">
+                        <table id="tableInfo" class="table" align="center">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th>Trunk Name</th>
+                                <th>Source Address</th>
+                                <th>Destination Address</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% if(trunkname != null && saddress != null && daddress != null && status != null){ %>
+                            <tr>
+                                <td><%= trunkname %></td>
+                                <td><%= saddress %></td>
+                                <td><%= daddress %></td>
+                                <td><%= status %></td>
+                            </tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
@@ -62,34 +77,91 @@
                             </thead>
                             <tbody>
 
-                            <% for(var i=0; i<listCall.length;i++){%>
-                            <!--<tr>
-                                <td><%=//listCall[i].calldate%></td>
-                                <td><%=listCall[i].src%></td>
-                                <td><%=listCall[i].dst%></td>
-                                <td><%=listCall[i].disposition%></td>
-                                <td><%=listCall[i].duration%></td>
-                            </tr>-->
-                            <%}%>
+                            <% for (var i = 0; i < listCall.length; i++) { %>
+                            <tr>
+                                <td><%= listCall[i].calldate %></td>
+                                <td><%= listCall[i].src %></td>
+                                <td><%= listCall[i].dst %></td>
+                                <td><%= listCall[i].disposition %></td>
+                                <td><%= listCall[i].duration %></td>
+                            </tr>
+                            <% } %>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-          <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="mb-3">Single Bar Chart </h4>
-                        <canvas id="singelBarChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!--</div>-->
     </div>
 </div>
 
 <% include ../Partials/footer %>
 </body>
-<script src="assets/js/myJS.js" type="text/javascript"> </script>
+
+<script>
+    function getCallsByDate() {
+
+        connectToAstDB().query('select calldate, duration from cdr where calldate between '2018-04-21 00:00:00' and '2018-04-21 23:59:59'', function (err, result) {
+            if (err) throw err;
+
+            connectToAstDB().end();
+        });
+    }
+</script>
+
+<script>
+    var ctx = document.getElementById("durationBarChart");
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ["Sun", "Mon", "Tu", "Wed", "Th", "Fri", "Sat"],
+            datasets: [
+                {
+                    label: "Total of minutes",
+                    data: [40, 55, 75, 81, 56, 55, 40],
+                    borderColor: "rgba(255, 0, 0, 0.9)",
+                    borderWidth: "0",
+                    backgroundColor: "rgba(255, 0, 0, 0.5)"
+                }
+            ]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    var ctx2 = document.getElementById("singelBarChart");
+    var myChart2 = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ["Sun", "Mon", "Tu", "Wed", "Th", "Fri", "Sat"],
+            datasets: [
+                {
+                    label: "Total of calls made",
+                    data: [40, 55, 75, 81, 56, 55, 40],
+                    borderColor: "rgba(0, 123, 255, 0.9)",
+                    borderWidth: "0",
+                    backgroundColor: "rgba(0, 123, 255, 0.5)"
+                }
+            ]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+</script>
+<script src="assets/js/myJS.js" type="text/javascript"></script>
 </html>

@@ -110,14 +110,14 @@ router.post('/SavePass', function(req, res, next) {
             if(error) throw error;
             if(result.length!=0 ){
                 if(oldPass==newPass){
-                    res.render('ChangePassword',{user:req.session.username,menj:"Old password matched new password. Please type a different.",power:power});
+                    res.render('ChangePassword',{user:req.session.username,menj:"Old password matched new password. Please type a different onef.",power:power});
                 }else {
                     connect().query('UPDATE user set password=? where id=?',
                         [newPass, id], function (err) {
                             if (err) throw err;
                             res.render('ChangePassword', {
                                 user: req.session.username,
-                                menj: "The changes was successful",
+                                menj: "Password changed successfully.",
                                 power:power
                             });
                         });
@@ -302,7 +302,7 @@ router.post('/newUser',function(req, res, next){
                 connect().query("INSERT INTO user(username,password,rol) VALUES (?,?,?)",[username,password,privilegio],function (error) {
                     if(error) throw error;
                     connect().end();
-                    loadListUser (res,"The Username was created successfully","","",req);
+                    loadListUser (res,"The user was created successfully","","",req);
                 });
             }else {
                 loadListUser (res,"The password doesn't match",username,privilegio,req);
@@ -566,6 +566,7 @@ function save(data){
 }
 
 function trunkInf(res,req){
+    var myData = [];
 connect().query("Select trunk_name,host from outgoing", function(err,result){
     if  (err) throw err;
     if(result.length != 0){
@@ -578,6 +579,20 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
                 connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result2) {
                     if (err) throw err;
                     if (result2.length != 0) {
+                       /* var date = new Date();
+                        var year = date.getFullYear();
+                        var month = date.getMonth()+ 1;
+                        var day = date.getDate()+1;
+                        var i = [1,2,3,4,5,6,7];
+                        i.forEach(function (value) {
+                            decreaseDay(day, function (yesterday) {
+                                day = yesterday;
+                            });
+                             queryCallDates(year, month, day, function (queryResult) {
+                                myData.push(queryResult);
+                                console.log(queryResult);
+                            });
+                        });*/
                         res.render('index', {
                             trunkname: row.trunk_name,
                             saddress: myip.address(),
@@ -609,6 +624,35 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
     }
 });
 connect().end();
+}
+
+function print(data, callback) {
+    if(data.length != 0){
+        console.log("info: " + data);
+        return callback(1);
+    }else{
+        return callback(null);
+    }
+
+}
+
+function loop2GetData(data, callback) {
+
+    return data;
+}
+
+function queryCallDates(year, month, day, callback) {
+   connectToAstDB().query('select calldate, duration from cdr where calldate between "?-?-? 00:00:00" and "?-?-? 23:59:59"', [year,month,day,year,month,day], function (err, get) {
+       console.log("today is: " +day);
+       console.log("select calldate, duration from cdr where calldate between '"+year+"-"+month+"-"+day+" 00:00:00' and '"+year+"-"+month+"-"+day+" 23:59:59';");
+       connectToAstDB().end();
+       return callback(get);
+   });
+}
+
+function decreaseDay(day, callback) {
+    var decreasedDay = callback(day-1);
+    return decreasedDay;
 }
 
 function checkNloadRoute(res,req) {
@@ -724,11 +768,14 @@ function loadListUser (res,menj,username,privilegio,req){
     });
     connect().end();
 }
+
 function loadListCall() {
     connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result) {
         if (err) throw err;
         if (result.length != 0) {
-                return result;
+            console.log(result[0].calldate);
+            return result;
+
         }
         connectToAstDB().end();
     });

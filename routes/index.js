@@ -428,7 +428,7 @@ function connect(){
         host: 'localhost',
         user: 'root',
         password: 'rl2013',
-        database: 'VGgateway',
+        database: 'VGgatewayDB',
         port: 3306,
         insecureAuth : true
     });
@@ -438,7 +438,7 @@ function connectToAstDB(){
         host: 'localhost',
         user: 'root',
         password: 'rl2013',
-        database: 'asteriskcdrdb',
+        database: 'asteriskcdr',
         port: 3306,
         insecureAuth : true
     });

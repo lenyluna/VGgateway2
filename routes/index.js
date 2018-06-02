@@ -117,7 +117,7 @@ router.post('/SavePass', function(req, res, next) {
                             if (err) throw err;
                             res.render('ChangePassword', {
                                 user: req.session.username,
-                                menj: "Password changed successfully.",
+                                menj: "Password changed successfully",
                                 power:power
                             });
                         });

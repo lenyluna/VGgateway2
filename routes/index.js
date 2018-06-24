@@ -234,13 +234,13 @@ router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
 });
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
-    connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
+    connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'user',data.host],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
     });
 
-    connect().query('INSERT INTO incoming VALUES (?,?,?,?,?)',[1,data.usernameI,data.passwordI,'from-trunk','peer'],function (err, result) {
+    connect().query('INSERT INTO incoming VALUES (?,?,?,?,?)',[1,data.usernameI,data.passwordI,'from-trunk','user'],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();

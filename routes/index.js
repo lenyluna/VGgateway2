@@ -145,7 +145,7 @@ router.get('/applyRoutes',isAuthe, function(req, res, next) {
 router.post('/saveRoutes', urlencodedParser, function(req, res, next) {
     var getData = req.body;
     var number = parsePhoneNum(getData.phoneNum);
-    connect().query('insert into routes values (?,?,?,?,?)', [1,getData.trunkName, getData.dialPattern, number, getData.redirect], function (err,result) {
+    connect().query('insert into routes values (?,?,?,?)', [1,getData.trunkName, getData.dialPattern, number], function (err,result) {
         if (err) throw err;
        // console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
@@ -160,14 +160,14 @@ router.post('/saveRoutes', urlencodedParser, function(req, res, next) {
 router.post('/modifyRoutes', urlencodedParser, function(req, res, next) {
     var getData = req.body;
     var number = parsePhoneNum(getData.phoneNum);
-    connect().query('update routes set trunkName = ?, dialPattern = ?, phoneNum = ?, redirect = ? where id = 1', [getData.trunkName, getData.dialPattern, number, getData.redirect], function (err,result) {
+    connect().query('update routes set trunkName = ?, dialPattern = ?, phoneNum = ? where id = 1', [getData.trunkName, getData.dialPattern, number], function (err,result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
     });
     modifyRoute = false;
     applyRoute = true;
-    console.log(number + getData.dialPattern + getData.trunkName + getData.redirect);
+    console.log(number + getData.dialPattern + getData.trunkName);
     checkNloadRoute(res,req);
 });
 
@@ -234,7 +234,7 @@ router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
 });
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
-    connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'user',data.host],function (err, result) {
+    connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
@@ -454,60 +454,15 @@ function writeRoutes() {
             write = "[inbound]\n" +
                 "exten => _10XX,1,Log(NOTICE, Incoming call from ${CALLERID(all)})\n" +
                 "exten => _10XX,n,Dial(SIP/user2)\n" +
-                "exten => _10XX,n,Hangup()\n" +
-                "\n" +
+                "exten => _10XX,n,Hangup()\n\n" +
                 "[from-trunk]\n" +
-                "exten => _10XX,1,Dial(SIP/"+row.trunkName+"/${EXTEN})\n" + //lo que esta de aqui para arriba solo es para prueba
-                "\n" +                                                   //hay que quitarlo a futuro.
-                "exten => "+ row.dialPattern+ ",1,Goto(outbound-dongle,${EXTEN},1)\n" +
-                "\n" +
-                "[outbound-dongle]\n" +
-                "exten => "+ row.dialPattern+ ",1,Log(Notice, outbound call from ${CALLERID(all)})\n" +
-                "exten => "+ row.dialPattern+ ",n,Dial(dongle/dongle0/${EXTEN})\n" +
+                "exten => _10XX,1,Dial(SIP/"+row.trunkName+"/${EXTEN})\n" +
+                "exten => _20XX,1,Dial(SIP/${EXTEN})\n"+
+                "exten => "+ row.dialPattern+ ",1,AGI(/var/lib/asterisk/agi-bin/LlamadaGSM.py, ${EXTEN})\n" +
+                "exten => "+ row.dialPattern+ ",n,Dial(CONSOLE/DSP)\n" +
                 "exten => "+ row.dialPattern+ ",n,Hangup()\n" +
-                "\n" +
-                "\n" +
-                "[from-trunk-dongle]\n" +
-                "exten => _.,1,Log(El numero que usted marco es: ${EXTEN})\n" +
-                "exten => _.,n,Dial(SIP/"+ row.trunkName+ "/"+row.redirect+")\n";
-            saveRoute(write,1);
-            write = "[general]\n" +
-                "\n" +
-                "interval=15              \n" +
-                "\n" +
-                "[defaults]\n" +
-                "\n" +
-                "context=from-trunk-dongle\n" +
-                "group=0                  \n" +
-                "rxgain=0                 \n" +
-                "txgain=0                 \n" +
-                "autodeletesms=yes        \n" +
-                "resetdongle=yes          \n" +
-                "u2diag=-1                \n" +
-                "usecallingpres=yes       \n" +
-                "callingpres=allowed_passed_screen\n" +
-                "disablesms=no     \n" +
-                "\n" +
-                "language=en       \n" +
-                "smsaspdu=yes      \n" +
-                "mindtmfgap=45     \n" +
-                "mindtmfduration=80\n" +
-                "mindtmfinterval=20\n" +
-                "\n" +
-                "callwaiting=auto  \n" +
-                "\n" +
-                "disable=no        \n" +
-                "\n" +
-                "initstate=start   \n" +
-                "\n" +
-                "exten=+1"+row.phoneNum+"\n" +
-                "\n" +
-                "dtmf=relax        \n" +
-                "\n" +
-                "[dongle0]\n" +
-                "audio=/dev/ttyUSB1\n" +
-                "data=/dev/ttyUSB2";
-            saveRoute(write,2);
+                "exten => h,1,AGI(/var/lib/asterisk/agi-bin/HangupGSM.py)\n";
+            saveRoute(write);
         });
         connect().end();
     });
@@ -534,8 +489,7 @@ function writeFile(){
     mensajeApply=true;
 }
 
-function saveRoute(data,num){
-    if(num == 1){
+function saveRoute(data){
         fs.writeFile('/etc/asterisk/extensions_custom.conf',data,function(err) {
             if (err) {
                 throw err;
@@ -543,16 +497,6 @@ function saveRoute(data,num){
                 console.log('Guardado Satisfactoriamente');
             }
         });
-    }
-    if(num == 2){
-        fs.writeFile('/etc/asterisk/dongle.conf',data,function(err) {
-            if (err) {
-                throw err;
-            } else {
-                console.log('Guardado Satisfactoriamente');
-            }
-        });
-    }
 }
 
 function save(data){
@@ -573,6 +517,7 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
         Object.keys(result).forEach(function(key) {
             var row = result[key];
             command.get('asterisk -rx "sip show peer '+row.trunk_name+'"',function(err, data, stderr) {
+                console.log("Nombre trunk: " + row.trunk_name);
                 var getStatus = cmdParser(data).between('Status', "\n").s;
                 var cleanUp = getStatus.split(':');
                 var trim = cleanUp[1].trim();
@@ -660,10 +605,10 @@ function checkNloadRoute(res,req) {
         if (err) throw err;
         if (result.length != 0) {
             modifyRoute = false;
-            connect().query('select trunkName,dialPattern,phoneNum,redirect from routes;', function (err,result) {
+            connect().query('select trunkName,dialPattern,phoneNum from routes;', function (err,result) {
                 Object.keys(result).forEach(function(key) {
                     var row = result[key];
-                    res.render('Routes',{modify:modifyRoute,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,redirect:row.redirect,user:req.session.username,mensaje:false,power:power});
+                    res.render('Routes',{modify:modifyRoute,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,user:req.session.username,mensaje:false,power:power});
                 });
                 connect().end();
             });

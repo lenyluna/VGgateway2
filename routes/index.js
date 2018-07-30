@@ -167,7 +167,7 @@ router.post('/modifyRoutes', urlencodedParser, function(req, res, next) {
     });
     modifyRoute = false;
     applyRoute = true;
-    console.log(number + getData.dialPattern + getData.trunkName + getData.redirect);
+    console.log(number + getData.dialPattern + getData.trunkName);
     checkNloadRoute(res,req);
 });
 
@@ -234,7 +234,7 @@ router.post('/ConfiguracionTrunk/actualizar', function(req, res, next) {
 });
 router.post('/ConfiguracionTrunk/guardar', urlencodedParser, function(req, res) {
     var data = req.body;
-    connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'user',data.host],function (err, result) {
+    connect().query('INSERT INTO outgoing VALUES (?,?,?,?,?,?,?,?)',[1,data.usernameT,data.trunkname,data.fromuser,data.secret,data.port,'peer',data.host],function (err, result) {
         if (err) throw err;
         console.log("Number of records inserted: " + result.affectedRows);
         connect().end();
@@ -454,21 +454,14 @@ function writeRoutes() {
             write = "[inbound]\n" +
                 "exten => _10XX,1,Log(NOTICE, Incoming call from ${CALLERID(all)})\n" +
                 "exten => _10XX,n,Dial(SIP/user2)\n" +
-                "exten => _10XX,n,Hangup()\n" +
-                "\n" +
+                "exten => _10XX,n,Hangup()\n\n" +
                 "[from-trunk]\n" +
-                "exten => _10XX,1,Dial(SIP/"+row.trunkName+"/${EXTEN})\n" + //lo que esta de aqui para arriba solo es para prueba
-                "\n" +                                                   //hay que quitarlo a futuro.
-                "exten => _20XX,1,Dial(SIP/${EXTEN})"
-                "\n"+
-                +"exten => "+ row.dialPattern+ ",1,AGI(/var/lib/asterisk/agi-bin/LlamadaGSM.py, ${EXTEN})\n" +
-                "\n" +
-                +"exten => "+ row.dialPattern+ ",n,Dial(CONSOLE/DSP)\n" +
-                "\n" +
-                +"exten => "+ row.dialPattern+ ",n,Hangup()\n" +
-                "\n" +
-                +"exten => h,1,AGI(/var/lib/asterisk/agi-bin/HangupGSM.py)\n" +
-                "\n"
+                "exten => _10XX,1,Dial(SIP/"+row.trunkName+"/${EXTEN})\n" +
+                "exten => _20XX,1,Dial(SIP/${EXTEN})\n"+
+                "exten => "+ row.dialPattern+ ",1,AGI(/var/lib/asterisk/agi-bin/LlamadaGSM.py, ${EXTEN})\n" +
+                "exten => "+ row.dialPattern+ ",n,Dial(CONSOLE/DSP)\n" +
+                "exten => "+ row.dialPattern+ ",n,Hangup()\n" +
+                "exten => h,1,AGI(/var/lib/asterisk/agi-bin/HangupGSM.py)\n";
             saveRoute(write);
         });
         connect().end();
@@ -611,10 +604,10 @@ function checkNloadRoute(res,req) {
         if (err) throw err;
         if (result.length != 0) {
             modifyRoute = false;
-            connect().query('select trunkName,dialPattern,phoneNum,redirect from routes;', function (err,result) {
+            connect().query('select trunkName,dialPattern,phoneNum from routes;', function (err,result) {
                 Object.keys(result).forEach(function(key) {
                     var row = result[key];
-                    res.render('Routes',{modify:modifyRoute,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,redirect:row.redirect,user:req.session.username,mensaje:false,power:power});
+                    res.render('Routes',{modify:modifyRoute,apply:applyRoute, trunkName:row.trunkName,dialPattern:row.dialPattern,phoneNum:row.phoneNum,user:req.session.username,mensaje:false,power:power});
                 });
                 connect().end();
             });

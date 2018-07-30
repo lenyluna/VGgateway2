@@ -13,6 +13,7 @@ var cmdParser = require('string');
 var  os = require('os'); //para leer la direccion ip del VG gateway
 var setup = require ('setup'); //para poner la configuracion de la ip
 var mysql = require('mysql');
+var Promise = require('promise');
 var listSession = [];
 var urlencodedParser = bodyParser.urlencoded({
     extended: false
@@ -454,7 +455,7 @@ function writeRoutes() {
             write = "[inbound]\n" +
                 "exten => _10XX,1,Log(NOTICE, Incoming call from ${CALLERID(all)})\n" +
                 "exten => _10XX,n,Dial(SIP/user2)\n" +
-                "exten => _10XX,n,Hangup()\n\n" +
+                "exten => _10XX,n,Hangup()\n" +
                 "[from-trunk]\n" +
                 "exten => _10XX,1,Dial(SIP/"+row.trunkName+"/${EXTEN})\n" +
                 "exten => _20XX,1,Dial(SIP/${EXTEN})\n"+
@@ -517,34 +518,85 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
         Object.keys(result).forEach(function(key) {
             var row = result[key];
             command.get('asterisk -rx "sip show peer '+row.trunk_name+'"',function(err, data, stderr) {
+                console.log("Nombre trunk: " + row.trunk_name);
                 var getStatus = cmdParser(data).between('Status', "\n").s;
                 var cleanUp = getStatus.split(':');
                 var trim = cleanUp[1].trim();
                 connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result2) {
                     if (err) throw err;
                     if (result2.length != 0) {
-                       /* var date = new Date();
+                        var date = new Date();
                         var year = date.getFullYear();
                         var month = date.getMonth()+ 1;
                         var day = date.getDate()+1;
+                        var arrayDay= [];
                         var i = [1,2,3,4,5,6,7];
-                        i.forEach(function (value) {
-                            decreaseDay(day, function (yesterday) {
-                                day = yesterday;
+                        function info (){
+                            const promise = new Promise (function (resolve, reject) {
+                                i.forEach(function (value) {
+                                    decreaseDay(day, function (yesterday) {
+                                        arrayDay.push(yesterday);
+                                        day=yesterday;
+                                    });
+                                });
+                                resolve(arrayDay);
                             });
-                             queryCallDates(year, month, day, function (queryResult) {
-                                myData.push(queryResult);
-                                console.log(queryResult);
+                            return promise
+                        }
+                     function infoGra(array){
+                          var i = [0,1,2,3,4,5,6];
+                            let cantCall=[0,0,0,0,0,0,0];
+                            const promise = new Promise (function (resolve, reject) {
+                                  i.forEach(function (value) {
+                                        queryCallDates(year, month, array[value], function (queryResult) {
+                                            Object.keys(queryResult).forEach(function(key) {
+                                                var row2 = queryResult[key];
+                                                switch (row2.calldate.getDay()){
+                                                    case 1:
+                                                        cantCall[1]=queryResult.length;
+                                                        break;
+                                                    case 2:
+                                                        cantCall[2]=queryResult.length;
+                                                        break;
+                                                    case 3:
+                                                        cantCall[3]=queryResult.length;
+                                                        break;
+                                                    case 4:
+                                                        cantCall[4]=queryResult.length;
+                                                        break;
+                                                    case 5:
+                                                        cantCall[5]=queryResult.length;
+                                                        break;
+                                                    case 6:
+                                                        cantCall[6]=queryResult.length;
+                                                        break;
+                                                    case 7:
+                                                        cantCall[0]=queryResult.length;
+                                                        break;
+                                                }
+                                            });
+                                            if(value==6){
+                                                resolve(cantCall);
+                                            }
+                                    });
+
                             });
-                        });*/
-                        res.render('index', {
+                            });
+                           return promise
+                        }
+
+                        info().then(a=>{infoGra(a).then(b=>{
+                            res.render('index', {
                             trunkname: row.trunk_name,
                             saddress: myip.address(),
                             daddress: row.host,
                             status: trim,
                             user: req.session.username,
                             listCall: result2,
-                            power:power});
+                            power: power,
+                            listGra1: b
+                        });
+                    })});
                     }
                 });
             });
@@ -588,7 +640,6 @@ function loop2GetData(data, callback) {
 function queryCallDates(year, month, day, callback) {
    connectToAstDB().query('select calldate, duration from cdr where calldate between "?-?-? 00:00:00" and "?-?-? 23:59:59"', [year,month,day,year,month,day], function (err, get) {
        console.log("today is: " +day);
-       console.log("select calldate, duration from cdr where calldate between '"+year+"-"+month+"-"+day+" 00:00:00' and '"+year+"-"+month+"-"+day+" 23:59:59';");
        connectToAstDB().end();
        return callback(get);
    });

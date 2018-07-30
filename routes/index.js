@@ -91,16 +91,6 @@ function checkS(id){
     }
 
 }
-/*function checkSession(id, callback){
-    var exist= callback(false);
-   for(var i=0;i<listSession.length;i++){
-       if(listSession[i]==id){
-           exist = callback(true);
-       }
-   }
-   return exist;
-}
-*/
 router.post('/SavePass', function(req, res, next) {
     var oldPass = req.body.oldP;
     var newPass = req.body.newP;
@@ -481,7 +471,7 @@ function writeFile(){
                 +row.username+"\nfromuser="+row.fromuser+"\ntype="+row.type+"\nqualify=yes\n"+"port="+row.port+"\ncontext=inbound\n"
                 +"\n["+row.userIn+"]\n"+"secret="+row.secretIn+"\ntype="+row.typeIn+"\ncontext="+row.contextIn+"\n\n[2021]\n"+"type=friend\n"
                 +"host=dynamic\n"+"secret=rl123\n"+"context=from-trunk\n"+"callerid='Ricardo Luna'<2021>\n"
-                +"\n[2022]\n"+"type=friend\n"+"host=dynamic\n"+"secret=leny123\n"+"context=from-internal\n"+"callerid='Leny Luna' <2022>";
+                +"\n[2022]\n"+"type=friend\n"+"host=dynamic\n"+"secret=leny123\n"+"context=from-trunk\n"+"callerid='Leny Luna' <2022>";
             //console.log(infoOut);
            save(infoOut);
         });
@@ -511,14 +501,12 @@ function save(data){
 }
 
 function trunkInf(res,req){
-    var myData = [];
 connect().query("Select trunk_name,host from outgoing", function(err,result){
     if  (err) throw err;
     if(result.length != 0){
         Object.keys(result).forEach(function(key) {
             var row = result[key];
             command.get('asterisk -rx "sip show peer '+row.trunk_name+'"',function(err, data, stderr) {
-                console.log("Nombre trunk: " + row.trunk_name);
                 var getStatus = cmdParser(data).between('Status', "\n").s;
                 var cleanUp = getStatus.split(':');
                 var trim = cleanUp[1].trim();
@@ -579,7 +567,6 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
                                       queryCallM1nuto(year, month, array[value], function (queryResult2) {
                                           Object.keys(queryResult2).forEach(function(key) {
                                               var row3 = queryResult2[key];
-                                              console.log(queryResult2);
                                               if(row3.calldate!=null) {
                                                   switch (row3.calldate.getDay()) {
                                                       case 1:
@@ -611,12 +598,10 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
                                               resolve(cantCall);
                                           }
                                       });
-
                             });
                             });
                            return promise
                         }
-
                         info().then(a=>{infoGra(a).then(b=>{
                             res.render('index', {
                             trunkname: row.trunk_name,
@@ -638,6 +623,95 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
         connectToAstDB().query('select calldate, src, dst, disposition,duration from cdr', function (err, result2) {
             if (err) throw err;
             if (result2.length != 0) {
+                var date = new Date();
+                var year = date.getFullYear();
+                var month = date.getMonth()+ 1;
+                var day = date.getDate()+1;
+                var arrayDay= [];
+                var i = [1,2,3,4,5,6,7];
+                function info (){
+                    const promise = new Promise (function (resolve, reject) {
+                        i.forEach(function (value) {
+                            decreaseDay(day, function (yesterday) {
+                                arrayDay.push(yesterday);
+                                day=yesterday;
+                            });
+                        });
+                        resolve(arrayDay);
+                    });
+                    return promise
+                }
+                function infoGra(array){
+                    var i = [0,1,2,3,4,5,6];
+                    let cantCall={"cant":[0,0,0,0,0,0,0],"time":[0,0,0,0,0,0,0]};
+                    const promise = new Promise (function (resolve, reject) {
+                        i.forEach(function (value) {
+                            queryCallDates(year, month, array[value], function (queryResult) {
+                                Object.keys(queryResult).forEach(function(key) {
+                                    var row2 = queryResult[key];
+                                    switch (row2.calldate.getDay()){
+                                        case 1:
+                                            cantCall.cant[1]=queryResult.length;
+                                            break;
+                                        case 2:
+                                            cantCall.cant[2]=queryResult.length;
+                                            break;
+                                        case 3:
+                                            cantCall.cant[3]=queryResult.length;
+                                            break;
+                                        case 4:
+                                            cantCall.cant[4]=queryResult.length;
+                                            break;
+                                        case 5:
+                                            cantCall.cant[5]=queryResult.length;
+                                            break;
+                                        case 6:
+                                            cantCall.cant[6]=queryResult.length;
+                                            break;
+                                        case 7:
+                                            cantCall.cant[0]=queryResult.length;
+                                            break;
+                                    }
+                                });
+                            });
+                            queryCallM1nuto(year, month, array[value], function (queryResult2) {
+                                Object.keys(queryResult2).forEach(function(key) {
+                                    var row3 = queryResult2[key];
+                                    if(row3.calldate!=null) {
+                                        switch (row3.calldate.getDay()) {
+                                            case 1:
+                                                cantCall.time[1] = row3.segundo;
+                                                break;
+                                            case 2:
+                                                cantCall.time[2] = row3.segundo;
+
+                                                break;
+                                            case 3:
+                                                cantCall.time[3] = row3.segundo;
+                                                break;
+                                            case 4:
+                                                cantCall.time[4] = row3.segundo;
+                                                break;
+                                            case 5:
+                                                cantCall.time[5] = row3.segundo;
+                                                break;
+                                            case 6:
+                                                cantCall.time[6] = row3.segundo;
+                                                break;
+                                            case 7:
+                                                cantCall.time[0] = row3.segundo;
+                                                break;
+                                        }
+                                    }
+                                });
+                                if(value==6){
+                                    resolve(cantCall);
+                                }
+                            });
+                        });
+                    });
+                    return promise
+                }
                 info().then(a=>{infoGra(a).then(b=>{
                 res.render('index', {
                     trunkname: null,
@@ -657,24 +731,8 @@ connect().query("Select trunk_name,host from outgoing", function(err,result){
 connect().end();
 }
 
-function print(data, callback) {
-    if(data.length != 0){
-        console.log("info: " + data);
-        return callback(1);
-    }else{
-        return callback(null);
-    }
-
-}
-
-function loop2GetData(data, callback) {
-
-    return data;
-}
-
 function queryCallDates(year, month, day, callback) {
    connectToAstDB().query('select calldate, duration from cdr where calldate between "?-?-? 00:00:00" and "?-?-? 23:59:59"', [year,month,day,year,month,day], function (err, get) {
-       //console.log("today is: " +day);
        connectToAstDB().end();
        return callback(get);
    });
@@ -682,7 +740,6 @@ function queryCallDates(year, month, day, callback) {
 
 function queryCallM1nuto(year, month, day, callback) {
     connectToAstDB().query('select calldate, (sum(duration)/60) as segundo from cdr where calldate between "?-?-? 00:00:00" and "?-?-? 23:59:59"', [year,month,day,year,month,day], function (err, get) {
-        console.log("today is: " +day);
         connectToAstDB().end();
         return callback(get);
     });
